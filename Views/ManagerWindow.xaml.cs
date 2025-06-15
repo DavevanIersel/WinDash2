@@ -15,6 +15,9 @@ public sealed partial class ManagerWindow : Window
 
     private readonly WidgetManager _widgetManager;
 
+    private readonly bool _isInitialized;
+
+
     public ManagerWindow(WidgetManager widgetManager)
     {
         _widgetManager = widgetManager;
@@ -23,16 +26,12 @@ public sealed partial class ManagerWindow : Window
         // Load all widgets into _allWidgets
         foreach (var widget in widgetManager.GetWidgets())
         {
-            _allWidgets.Add(new Widget
-            {
-                Id = widget.Id,
-                Name = widget.Name,
-                Enabled = widget.Enabled
-            });
+            _allWidgets.Add(widget);
         }
 
         // Initially, copy all to filtered view
         ApplyFilter("");
+        _isInitialized = true;
     }
 
     private void ApplyFilter(string query)
@@ -54,9 +53,19 @@ public sealed partial class ManagerWindow : Window
         ApplyFilter(query);
     }
 
-    private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+    private async void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
     {
-        // Optional: Update underlying _allWidgets too, if needed
+        if (!_isInitialized)
+            return;
+
+        if (sender is ToggleSwitch toggleSwitch && toggleSwitch.DataContext is Widget widget)
+        {
+            toggleSwitch.IsEnabled = false;
+            widget.Enabled = toggleSwitch.IsOn;
+            await _widgetManager.SaveWidgetAsync(widget);
+
+            toggleSwitch.IsEnabled = true;
+        }
     }
 
     private void EditButton_Click(object sender, RoutedEventArgs e)
