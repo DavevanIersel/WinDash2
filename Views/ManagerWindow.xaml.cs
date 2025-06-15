@@ -62,7 +62,7 @@ public sealed partial class ManagerWindow : Window
         {
             toggleSwitch.IsEnabled = false;
             widget.Enabled = toggleSwitch.IsOn;
-            await _widgetManager.SaveWidgetAsync(widget);
+            await _widgetManager.SaveWidgetAsync(widget, true);
 
             toggleSwitch.IsEnabled = true;
         }

@@ -68,18 +68,22 @@ public class WidgetManager
             {
                 return;
             }
-            var widgetWindow = new WidgetWindow(widget);
+            var widgetWindow = new WidgetWindow(this, widget);
             widgetWindow.Activate();
 
             _widgetWindows[widget.IdOrThrow] = widgetWindow;
         }
     }
 
-    public async Task SaveWidgetAsync(Widget widget)
+    public async Task SaveWidgetAsync(Widget widget, bool rerender)
     {
         await _widgetFileSystemService.SaveWidgetAsync(widget);
         _widgetConfigs[widget.IdOrThrow] = widget;
-        CreateOrUpdateWidgetWindow(widget);
+
+        if (rerender)
+        {
+            CreateOrUpdateWidgetWindow(widget);
+        }
     }
 
     public IReadOnlyCollection<Widget> GetWidgets() => _widgetConfigs.Values.ToList().AsReadOnly();
