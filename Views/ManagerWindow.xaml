@@ -6,10 +6,72 @@
     xmlns:local="using:WinDash2.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:WinDash2.Models"
+    xmlns:tableView="using:WinUI.TableView"
     mc:Ignorable="d"
     Title="Widget Manager">
 
-    <Grid>
-        <TextBlock Text="Dashboard Manager (nog leeg)" />
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid Padding="20">
+        <StackPanel>
+            <TextBlock Text="Widget Library" FontSize="24" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBox
+    PlaceholderText="Search widgets..."
+    Margin="0,0,0,10"
+    TextChanged="SearchBox_TextChanged"/>
+            <tableView:TableView
+                ItemsSource="{x:Bind FilteredWidgets}"
+                AutoGenerateColumns="False"
+                SelectionMode="None"
+                CanResizeColumns="False"
+                CanSortColumns="True"
+                Height="500">
+
+                <tableView:TableView.Columns>
+                    <tableView:TableViewTemplateColumn Header="" Width="40">
+                        <tableView:TableViewTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="models:Widget">
+                                <Grid>
+                                    <Ellipse Width="16" Height="16" Fill="Green"
+                         Visibility="{Binding Enabled, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                                    <Ellipse Width="16" Height="16" Fill="Red"
+                         Visibility="{Binding Enabled, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                                </Grid>
+                            </DataTemplate>
+                        </tableView:TableViewTemplateColumn.CellTemplate>
+                    </tableView:TableViewTemplateColumn>
+
+                    <!-- Name (Text) Column -->
+                    <tableView:TableViewTextColumn
+                        Header="Name"
+                        Width="*"
+                        Binding="{Binding Name}"/>
+
+                    <!-- Enabled (ToggleSwitch via Template) -->
+                    <tableView:TableViewTemplateColumn Header="Enabled" Width="Auto">
+                        <tableView:TableViewTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="models:Widget">
+                                <ToggleSwitch 
+                                    IsOn="{x:Bind Enabled, Mode=TwoWay}" 
+                                    Toggled="ToggleSwitch_Toggled"/>
+                            </DataTemplate>
+                        </tableView:TableViewTemplateColumn.CellTemplate>
+                    </tableView:TableViewTemplateColumn>
+
+                    <!-- Actions (Button via Template) -->
+                    <tableView:TableViewTemplateColumn Header="Actions" Width="Auto">
+                        <tableView:TableViewTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="models:Widget">
+                                <Button Content="Edit" Click="EditButton_Click"/>
+                            </DataTemplate>
+                        </tableView:TableViewTemplateColumn.CellTemplate>
+                    </tableView:TableViewTemplateColumn>
+                </tableView:TableView.Columns>
+            </tableView:TableView>
+        </StackPanel>
     </Grid>
 </Window>

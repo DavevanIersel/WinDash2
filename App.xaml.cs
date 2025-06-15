@@ -1,4 +1,7 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Diagnostics;
 using WinDash2.Core;
@@ -32,6 +35,8 @@ public partial class App : Application
         {
             WidgetManager s = new WidgetManager(new Services.WidgetFileSystemService("C:\\Users\\davei\\AppData\\Roaming\\windash2\\widgets"));
             s.Initialize();
+            _window = new ManagerWindow(s);
+            _window.Activate();
             //_window = new WidgetWindow("https://open.spotify.com/");
             //_window.Activate();
             //new ManagerWindow().Activate();
@@ -41,4 +46,6 @@ public partial class App : Application
             Debug.WriteLine("Unhandled exception during launch: " + ex);
         }
     }
+
+
 }

@@ -54,11 +54,21 @@ public class WidgetManager
     {
         if (_widgetWindows.TryGetValue(widget.IdOrThrow, out var existingWindow))
         {
+            if (!widget.Enabled)
+            {
+                existingWindow.Close();
+                _widgetWindows.Remove(widget.IdOrThrow);
+                return;
+            }
             //existingWindow.UpdateWidget(widget);
             existingWindow.Activate();
         }
         else
         {
+            if (!widget.Enabled)
+            {
+                return;
+            }
             var widgetWindow = new WidgetWindow(widget);
             widgetWindow.Activate();
 

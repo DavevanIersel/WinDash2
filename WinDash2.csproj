@@ -44,6 +44,7 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3296.44" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250606001" />
+    <PackageReference Include="WinUI.TableView" Version="1.2.2" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\Themes\" />

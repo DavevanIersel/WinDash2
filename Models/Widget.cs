@@ -25,7 +25,7 @@ public class Widget
     [JsonPropertyName("touchEnabled")]
     public bool? TouchEnabled { get; set; }                                  // Indicates whether touch controls are simulated
     [JsonPropertyName("enabled")]
-    public bool? Enabled { get; set; }                                       // Toggle widget on or off
+    public bool Enabled { get; set; }                                       // Toggle widget on or off
     [JsonPropertyName("customUserAgent")]
     public List<UserAgentMapping>? CustomUserAgent { get; set; } = [];       // Mapping of domains to custom user agents(Some widget will make calls to different websites, which might require different user agents. CloudFlare or Google Login requests for example)
     [JsonPropertyName("permissions")]
