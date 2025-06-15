@@ -11,14 +11,13 @@ namespace WinDash2.Core;
 
 public class WidgetManager
 {
-    private readonly WidgetFileSystemService _widgetFileSystemService;
-
     private readonly Dictionary<Guid, Widget> _widgetConfigs = [];
     private readonly Dictionary<Guid, WidgetWindow> _widgetWindows = [];
+    private readonly WidgetFileSystemService _widgetFileSystemService;
 
     public WidgetManager(WidgetFileSystemService widgetFileSystemService)
     {
-        _widgetFileSystemService = widgetFileSystemService ?? throw new ArgumentNullException(nameof(widgetFileSystemService));
+        _widgetFileSystemService = widgetFileSystemService;
     }
 
     public void Initialize()

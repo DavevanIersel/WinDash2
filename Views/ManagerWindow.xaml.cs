@@ -13,8 +13,11 @@ public sealed partial class ManagerWindow : Window
 
     public ObservableCollection<Widget> FilteredWidgets { get; } = new();
 
+    private readonly WidgetManager _widgetManager;
+
     public ManagerWindow(WidgetManager widgetManager)
     {
+        _widgetManager = widgetManager;
         this.InitializeComponent();
 
         // Load all widgets into _allWidgets

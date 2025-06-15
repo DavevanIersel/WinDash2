@@ -1,51 +1,52 @@
-﻿using Microsoft.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Media;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
-using System.Diagnostics;
+using Microsoft.UI.Xaml;
 using WinDash2.Core;
+using WinDash2.Services;
 using WinDash2.Views;
 
 namespace WinDash2;
 
-/// <summary>
-/// Provides application-specific behavior to supplement the default Application class.
-/// </summary>
 public partial class App : Application
 {
     private Window? _window;
+    public static IHost AppHost { get; private set; }
 
-    /// <summary>
-    /// Initializes the singleton application object.  This is the first line of authored code
-    /// executed, and as such is the logical equivalent of main() or WinMain().
-    /// </summary>
     public App()
     {
         InitializeComponent();
+
+        AppHost = Host.CreateDefaultBuilder()
+            .ConfigureServices((context, services) =>
+            {
+                // Register services
+                services.AddSingleton<WidgetFileSystemService>(provider =>
+                    new WidgetFileSystemService("C:\\Users\\davei\\AppData\\Roaming\\windash2\\widgets"));
+
+                // Register core managers
+                services.AddSingleton<WidgetManager>();
+
+                // Register views
+                services.AddTransient<ManagerWindow>();
+            })
+            .Build();
     }
 
-    /// <summary>
-    /// Invoked when the application is launched.
-    /// </summary>
-    /// <param name="args">Details about the launch request and process.</param>
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         try
         {
-            WidgetManager s = new WidgetManager(new Services.WidgetFileSystemService("C:\\Users\\davei\\AppData\\Roaming\\windash2\\widgets"));
-            s.Initialize();
-            _window = new ManagerWindow(s);
+            var widgetManager = AppHost.Services.GetRequiredService<WidgetManager>();
+            widgetManager.Initialize();
+
+            var window = AppHost.Services.GetRequiredService<ManagerWindow>();
+            _window = window;
             _window.Activate();
-            //_window = new WidgetWindow("https://open.spotify.com/");
-            //_window.Activate();
-            //new ManagerWindow().Activate();
         }
         catch (Exception ex)
         {
-            Debug.WriteLine("Unhandled exception during launch: " + ex);
+            System.Diagnostics.Debug.WriteLine("Unhandled exception during launch: " + ex);
         }
     }
-
-
 }
