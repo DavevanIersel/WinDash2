@@ -4,8 +4,10 @@ using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.Web.WebView2.Core;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using WinDash2.Models;
 using Windows.UI.WebUI;
 using WinRT.Interop;
@@ -33,16 +35,13 @@ public sealed partial class WidgetWindow : Window
 
         appWindow.Changed += AppWindow_Changed;
 
-        InitializeWindow();
+        InitializeWindow(widget);
     }
 
-    private async void InitializeWindow()
+    private async void InitializeWindow(Widget widget)
     {
-
         this.ExtendsContentIntoTitleBar = true;
-
         DragToggle.Toggled += DragToggle_Toggled;
-
         SetFrame(false);
 
         if (appWindow.Presenter is OverlappedPresenter presenter)
@@ -53,24 +52,45 @@ public sealed partial class WidgetWindow : Window
 
         // Ensure WebView2 is ready
         await MyWebView.EnsureCoreWebView2Async();
-        MyWebView.CoreWebView2.Settings.IsWebMessageEnabled = true;
-        MyWebView.CoreWebView2.PermissionRequested += CoreWebView2_PermissionRequested;
+        var coreWebView2 = MyWebView.CoreWebView2;
 
+        coreWebView2.Settings.IsWebMessageEnabled = true;
+        coreWebView2.PermissionRequested += CoreWebView2_PermissionRequested;
+        SetupUserAgent(widget, coreWebView2);
 
-        // Custom user agent
-        MyWebView.CoreWebView2.Settings.UserAgent = "Mozilla/5.0 (Android 15; Mobile; rv:133.0) Gecko/133.0 Firefox/133.0";
-
-        // Enable touch emulation
-        //await MyWebView.CoreWebView2.CallDevToolsProtocolMethodAsync("Emulation.setEmitTouchEventsForMouse", @"{
-        //        ""enabled"": true,
-        //        ""configuration"": ""mobile""
-        //    }");
-
-        // Enable devtools
-        //MyWebView.CoreWebView2.OpenDevToolsWindow();
-
-        MyWebView.CoreWebView2.Navigate(_url);
+        coreWebView2.Navigate(_url);
     }
+
+    private static void SetupUserAgent(Widget widget, CoreWebView2 coreWebView2)
+    {
+        if (widget.CustomUserAgent?.Count > 0)
+        {
+            // Register filter to intercept all requests
+            coreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+
+            coreWebView2.WebResourceRequested += (sender, args) =>
+            {
+                try
+                {
+                    var uri = new Uri(args.Request.Uri);
+                    var host = uri.Host;
+
+                    var matchedUa = widget.CustomUserAgent
+                        .FirstOrDefault(ua => host.Contains(ua.Domain, StringComparison.OrdinalIgnoreCase));
+
+                    if (matchedUa != null)
+                    {
+                        args.Request.Headers.SetHeader("User-Agent", matchedUa.UserAgent);
+                    }
+                }
+                catch
+                {
+                    // Optional: log or ignore malformed URIs
+                }
+            };
+        }
+    }
+
     private void CoreWebView2_PermissionRequested(
     Microsoft.Web.WebView2.Core.CoreWebView2 sender,
     Microsoft.Web.WebView2.Core.CoreWebView2PermissionRequestedEventArgs args)
