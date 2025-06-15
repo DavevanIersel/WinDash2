@@ -3,10 +3,10 @@
   "name": "Spotify",
   "url": "https://open.spotify.com",
   "enabled": false,
-  "x": 2,
-  "y": 11,
-  "width": 15,
-  "height": 8,
+  "x": 3295,
+  "y": 208,
+  "width": 832,
+  "height": 464,
   "touchEnabled": true,
   "customUserAgent": [
     {

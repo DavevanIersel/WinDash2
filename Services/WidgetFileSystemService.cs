@@ -24,13 +24,9 @@ public class WidgetFileSystemService
             WriteIndented = true,
             PropertyNameCaseInsensitive = true
         };
-
-        // Fix: Replace the incorrect method call with the correct Dahomey.Json extension method
-        //_jsonOptions.GetTypeRegistry()
-        //    .RegisterEnumConverter<Permission>();
     }
 
-    public async Task<List<Widget>> LoadAllWidgetsAsync()
+    public List<Widget> LoadAllWidgets()
     {
         if (!Directory.Exists(_widgetsFolderPath))
         {
@@ -43,71 +39,46 @@ public class WidgetFileSystemService
 
         var widgets = new List<Widget>();
 
-        //foreach (var file in widgetFiles)
-        //{
-        //    try
-        //    {
-        //        var fileInfo = new FileInfo(file);
-        //        Debug.WriteLine($"Reading file: {file} ({fileInfo.Length} bytes)");
-
-        //        var readTask = File.ReadAllTextAsync(file);
-        //        if (await Task.WhenAny(readTask, Task.Delay(2000)) != readTask)
-        //        {
-        //            throw new TimeoutException($"Timed out reading file: {file}");
-        //        }
-
-        //        var json = readTask.Result;
-        //        var widget = JsonSerializer.Deserialize<Widget>(json, _jsonOptions);
-
-        //        if (widget != null)
-        //        {
-        //            widget.Id ??= Guid.NewGuid();
-        //            widget.FileName = Path.GetFileName(file);
-        //            widgets.Add(widget);
-        //            Debug.WriteLine($"Loaded widget: {widget.Name} ({widget.Id})");
-        //        }
-        //        else
-        //        {
-        //            Debug.WriteLine($"Null widget from: {file}");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine($"Error reading '{file}': {ex}");
-        //    }
-        //}
-        Widget s = new Widget
+        foreach (var file in widgetFiles)
         {
-            Id = Guid.NewGuid(),
-            Name = "Spotify",
-            Url = "https://open.spotify.com",
-            Enabled = false,
-            X = 3295,
-            Y = 208,
-            Width = 832,
-            Height = 464,
-            TouchEnabled = true
-        };
+            try
+            {
+                var fileInfo = new FileInfo(file);
+                Debug.WriteLine($"Reading file: {file} ({fileInfo.Length} bytes)");
 
-        Widget s2 = new Widget
-        {
-            Id = Guid.NewGuid(),
-            Name = "Marktplaats",  // You might want to change this to "Marktplaats" for clarity
-            Url = "https://www.marktplaats.nl/",
-            Enabled = false,
-            X = 2572,
-            Y = 207,
-            Width = 722,
-            Height = 1008,
-            TouchEnabled = true
-        };
-        return new List<Widget> { s, s2 };
+                var json = ReadFileContent(file);
 
+                var widget = JsonSerializer.Deserialize<Widget>(json, _jsonOptions);
 
+                if (widget != null)
+                {
+                    widget.Id ??= Guid.NewGuid();
+                    widget.FileName = Path.GetFileName(file);
+                    widgets.Add(widget);
+                    Debug.WriteLine($"Loaded widget: {widget.Name} ({widget.Id})");
+                }
+                else
+                {
+                    Debug.WriteLine($"Null widget from: {file}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error reading '{file}': {ex}");
+            }
+        }
 
         Debug.WriteLine($"Returning {widgets.Count} widgets");
         return widgets;
     }
+
+    string ReadFileContent(string path)
+    {
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+
 
     public async Task SaveWidgetAsync(Widget widget)
     {

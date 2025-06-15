@@ -31,7 +31,7 @@ public partial class App : Application
         try
         {
             WidgetManager s = new WidgetManager(new Services.WidgetFileSystemService("C:\\Users\\davei\\AppData\\Roaming\\windash2\\widgets"));
-            s.InitializeAsync().GetAwaiter().GetResult();
+            s.Initialize();
             //_window = new WidgetWindow("https://open.spotify.com/");
             //_window.Activate();
             //new ManagerWindow().Activate();
