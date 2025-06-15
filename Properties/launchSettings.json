@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WinDash2 (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "WinDash2 (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

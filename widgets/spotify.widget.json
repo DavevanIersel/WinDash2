@@ -1,0 +1,20 @@
+{
+  "$schema": "widget-schema.json",
+  "name": "Spotify",
+  "url": "https://open.spotify.com",
+  "enabled": false,
+  "x": 2,
+  "y": 11,
+  "width": 15,
+  "height": 8,
+  "touchEnabled": true,
+  "customUserAgent": [
+    {
+      "domain": "open.spotify.com",
+      "userAgent": "Mozilla/5.0 (Android 15; Mobile; rv:133.0) Gecko/133.0 Firefox/133.0"
+    }
+  ],
+  "permissions": {
+    "mediaKeySystem": true
+  }
+}
