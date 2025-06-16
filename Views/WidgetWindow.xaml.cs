@@ -27,7 +27,6 @@ public sealed partial class WidgetWindow : Window
 
     private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
-    private const int WM_ENTERSIZEMOVE = 0x0231;
     private const int WM_EXITSIZEMOVE = 0x0232;
 
     public WidgetWindow(WidgetManager widgetManager, Widget widget)
@@ -43,6 +42,7 @@ public sealed partial class WidgetWindow : Window
 
         appWindow.MoveAndResize(new Windows.Graphics.RectInt32(widget.X, widget.Y, widget.Width, widget.Height));
 
+        appWindow.IsShownInSwitchers = false;
         // Subclass the window proc to intercept native messages
         newWndProc = WndProc;
         oldWndProcPtr = SetWindowLongPtr(hWnd, GWLP_WNDPROC, Marshal.GetFunctionPointerForDelegate(newWndProc));
@@ -56,8 +56,7 @@ public sealed partial class WidgetWindow : Window
     private async void InitializeWindow()
     {
         this.ExtendsContentIntoTitleBar = true;
-        DragToggle.Toggled += DragToggle_Toggled;
-        SetFrame(false);
+        SetDraggable(false);
 
         if (appWindow.Presenter is OverlappedPresenter presenter)
         {
@@ -147,7 +146,7 @@ public sealed partial class WidgetWindow : Window
         return CallWindowProc(oldWndProcPtr, hwnd, msg, wParam, lParam);
     }
 
-    private void SetFrame(bool showFrame)
+    public void SetDraggable(bool showFrame)
     {
         if (appWindow.Presenter is OverlappedPresenter presenter)
         {
@@ -165,12 +164,6 @@ public sealed partial class WidgetWindow : Window
                 appWindow.TitleBar.SetDragRectangles(Array.Empty<Windows.Graphics.RectInt32>());
             }
         }
-    }
-
-    private void DragToggle_Toggled(object sender, RoutedEventArgs e)
-    {
-        var toggle = sender as ToggleSwitch;
-        SetFrame(toggle?.IsOn ?? false);
     }
 
     // P/Invoke declarations for subclassing

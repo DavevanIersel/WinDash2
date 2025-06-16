@@ -14,6 +14,7 @@ public class WidgetManager
     private readonly Dictionary<Guid, Widget> _widgetConfigs = [];
     private readonly Dictionary<Guid, WidgetWindow> _widgetWindows = [];
     private readonly WidgetFileSystemService _widgetFileSystemService;
+    private Boolean _isDraggable = false;
 
     public WidgetManager(WidgetFileSystemService widgetFileSystemService)
     {
@@ -51,8 +52,11 @@ public class WidgetManager
 
     private void CreateOrUpdateWidgetWindow(Widget widget)
     {
+        WidgetWindow? window;
+
         if (_widgetWindows.TryGetValue(widget.IdOrThrow, out var existingWindow))
         {
+            window = existingWindow;
             if (!widget.Enabled)
             {
                 existingWindow.Close();
@@ -60,7 +64,6 @@ public class WidgetManager
                 return;
             }
             //existingWindow.UpdateWidget(widget);
-            existingWindow.Activate();
         }
         else
         {
@@ -69,9 +72,21 @@ public class WidgetManager
                 return;
             }
             var widgetWindow = new WidgetWindow(this, widget);
-            widgetWindow.Activate();
+            window = widgetWindow;
 
             _widgetWindows[widget.IdOrThrow] = widgetWindow;
+        }
+
+        window.Activate();
+        window.SetDraggable(_isDraggable);
+    }
+
+    public void SetDraggable(bool draggable)
+    {
+        _isDraggable = draggable;
+        foreach (var window in _widgetWindows.Values)
+        {
+            window.SetDraggable(_isDraggable);
         }
     }
 

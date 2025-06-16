@@ -31,6 +31,7 @@ public sealed partial class ManagerWindow : Window
 
         // Initially, copy all to filtered view
         ApplyFilter("");
+
         _isInitialized = true;
     }
 

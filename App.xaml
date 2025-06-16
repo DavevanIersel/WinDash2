@@ -6,7 +6,7 @@
     xmlns:local="using:WinDash2"
     xmlns:converters="using:WinDash2.Converters">
     <Application.Resources>
-        <ResourceDictionary>
+        <ResourceDictionary x:Key="ResourceDirectory">
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <!-- Other merged dictionaries here -->

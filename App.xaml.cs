@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using H.NotifyIcon;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using Microsoft.UI.Xaml;
@@ -11,6 +12,7 @@ namespace WinDash2;
 public partial class App : Application
 {
     private Window? _window;
+    private TrayManager? _trayManager;
     public static IHost AppHost { get; private set; }
 
     public App()
@@ -29,20 +31,27 @@ public partial class App : Application
 
                 // Register views
                 services.AddTransient<ManagerWindow>();
+
+                // Register TrayManager with factory for ManagerWindow
+                services.AddSingleton(provider =>
+                    new TrayManager(() => provider.GetRequiredService<ManagerWindow>(),
+                    provider.GetRequiredService<WidgetManager>()));
             })
             .Build();
     }
 
-    protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         try
         {
             var widgetManager = AppHost.Services.GetRequiredService<WidgetManager>();
             widgetManager.Initialize();
 
-            var window = AppHost.Services.GetRequiredService<ManagerWindow>();
-            _window = window;
-            _window.Activate();
+            // Start tray manager (creates tray icon)
+            _trayManager = AppHost.Services.GetRequiredService<TrayManager>();
+
+            // Do not show any main window on startup
+            // Widgets will launch themselves, no taskbar or tray icon for them
         }
         catch (Exception ex)
         {
