@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using WinDash2.Core;
 using WinDash2.Models;
 using WinDash2.WidgetOptions;
@@ -46,10 +47,10 @@ public sealed partial class WidgetWindow : Window
         newWndProc = WndProc;
         oldWndProcPtr = SetWindowLongPtr(hWnd, GWLP_WNDPROC, Marshal.GetFunctionPointerForDelegate(newWndProc));
 
-        InitializeWindow();
+        _ = InitializeWindow();
     }
 
-    private async void InitializeWindow()
+    private async Task InitializeWindow()
     {
         SetupTitleBar();
         SetDraggable(false);
@@ -63,6 +64,8 @@ public sealed partial class WidgetWindow : Window
         {
             option.Apply(_widget, WidgetWebView.CoreWebView2);
         }
+
+        this.Closed += OnWindowClosed;
 
         WidgetWebView.CoreWebView2.Navigate(_widget.Url);
     }
@@ -80,22 +83,22 @@ public sealed partial class WidgetWindow : Window
 
     public void SetDraggable(bool showFrame)
     {
-        if (appWindow.Presenter is OverlappedPresenter presenter)
-        {
-            if (showFrame)
-            {
-                presenter.IsResizable = true;
-                presenter.SetBorderAndTitleBar(true, true);
-            }
-            else
-            {
-                presenter.IsResizable = false;
-                presenter.SetBorderAndTitleBar(true, false);
+        if (appWindow.Presenter is not OverlappedPresenter presenter) return;
 
-                SetTitleBar(null);
-                appWindow.TitleBar.SetDragRectangles(Array.Empty<Windows.Graphics.RectInt32>());
-            }
+        presenter.IsResizable = showFrame;
+        presenter.SetBorderAndTitleBar(true, showFrame);
+
+        if (!showFrame)
+        {
+            SetTitleBar(null);
+            appWindow.TitleBar.SetDragRectangles([]);
         }
+    }
+
+    private async void OnWindowClosed(object sender, WindowEventArgs args)
+    {
+        _widget.Enabled = false;
+        await _widgetManager.SaveWidgetAsync(_widget, false);
     }
 
     private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
@@ -117,8 +120,6 @@ public sealed partial class WidgetWindow : Window
         _widget.Y = pos.Y;
         _widget.Width = rect.Width;
         _widget.Height = rect.Height;
-
-        Debug.WriteLine($"Move/resize finished: X={pos.X}, Y={pos.Y}, W={rect.Width}, H={rect.Height}");
 
         await _widgetManager.SaveWidgetAsync(_widget, false);
     }
