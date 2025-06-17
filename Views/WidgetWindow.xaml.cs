@@ -63,7 +63,6 @@ public sealed partial class WidgetWindow : Window
         {
             option.Apply(_widget, WidgetWebView.CoreWebView2);
         }
-        //coreWebView2.Settings.IsWebMessageEnabled = true; // Enables JS to C# messaging with the widget, using coreWebView2.WebMessageReceived and coreWebView2.PostWebMessageAsString (Can probably be removed)
 
         WidgetWebView.CoreWebView2.Navigate(_widget.Url);
     }
@@ -106,8 +105,7 @@ public sealed partial class WidgetWindow : Window
             OnMoveResizeFinished();
         }
 
-        return new nint();
-        //return CallWindowProc(oldWndProcPtr, hwnd, msg, wParam, lParam);
+        return CallWindowProc(oldWndProcPtr, hwnd, msg, wParam, lParam);
     }
 
     private async void OnMoveResizeFinished()
