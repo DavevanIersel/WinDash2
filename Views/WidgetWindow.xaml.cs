@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using WinDash2.Core;
 using WinDash2.Models;
+using WinDash2.WidgetOptions;
 using WinRT.Interop;
 
 namespace WinDash2.Views;
@@ -29,6 +30,15 @@ public sealed partial class WidgetWindow : Window
 
     private const int WM_EXITSIZEMOVE = 0x0232;
 
+    private readonly IWidgetOption[] options = new IWidgetOption[]
+    {
+        new UserAgentOption(),
+        new PermissionsOption(),
+        // new TouchOption(),
+        // new PermissionsOption(),
+        // etc.
+    };
+
     public WidgetWindow(WidgetManager widgetManager, Widget widget)
     {
         this.InitializeComponent();
@@ -43,80 +53,48 @@ public sealed partial class WidgetWindow : Window
         appWindow.MoveAndResize(new Windows.Graphics.RectInt32(widget.X, widget.Y, widget.Width, widget.Height));
 
         appWindow.IsShownInSwitchers = false;
-        // Subclass the window proc to intercept native messages
         newWndProc = WndProc;
         oldWndProcPtr = SetWindowLongPtr(hWnd, GWLP_WNDPROC, Marshal.GetFunctionPointerForDelegate(newWndProc));
-
-        // Subscribe to Changed event if you want (optional)
-        // appWindow.Changed += AppWindow_Changed;
-
         InitializeWindow();
     }
 
     private async void InitializeWindow()
     {
-        this.ExtendsContentIntoTitleBar = true;
+        SetupTitleBar();
         SetDraggable(false);
+
+        await WidgetWebView.EnsureCoreWebView2Async();
+
+        foreach (var option in options)
+        {
+            option.Apply(_widget, WidgetWebView.CoreWebView2);
+        }
+        //coreWebView2.Settings.IsWebMessageEnabled = true; // Enables JS to C# messaging with the widget, using coreWebView2.WebMessageReceived and coreWebView2.PostWebMessageAsString (Can probably be removed)
+
+        WidgetWebView.CoreWebView2.Navigate(_widget.Url);
+    }
+
+    private void SetupTitleBar()
+    {
+        this.ExtendsContentIntoTitleBar = true;
 
         if (appWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.IsMaximizable = false;
             presenter.IsMinimizable = false;
         }
-
-        // Ensure WebView2 is ready
-        await MyWebView.EnsureCoreWebView2Async();
-        var coreWebView2 = MyWebView.CoreWebView2;
-
-        coreWebView2.Settings.IsWebMessageEnabled = true;
-        coreWebView2.PermissionRequested += CoreWebView2_PermissionRequested;
-        SetupUserAgent(_widget, coreWebView2);
-
-        coreWebView2.Navigate(_widget.Url);
     }
 
-    private static void SetupUserAgent(Widget widget, CoreWebView2 coreWebView2)
+    private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
-        if (widget.CustomUserAgent?.Count > 0)
+        switch (msg)
         {
-            coreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
-
-            coreWebView2.WebResourceRequested += (sender, args) =>
-            {
-                try
-                {
-                    var uri = new Uri(args.Request.Uri);
-                    var host = uri.Host;
-
-                    var matchedUa = widget.CustomUserAgent
-                        .FirstOrDefault(ua => host.Contains(ua.Domain, StringComparison.OrdinalIgnoreCase));
-
-                    if (matchedUa != null)
-                    {
-                        args.Request.Headers.SetHeader("User-Agent", matchedUa.UserAgent);
-                    }
-                }
-                catch
-                {
-                    // Ignore malformed URIs
-                }
-            };
-        }
-    }
-
-    private void CoreWebView2_PermissionRequested(CoreWebView2 sender, CoreWebView2PermissionRequestedEventArgs args)
-    {
-        if (args.PermissionKind == CoreWebView2PermissionKind.Microphone ||
-            args.PermissionKind == CoreWebView2PermissionKind.Camera)
-        {
-            args.State = CoreWebView2PermissionState.Allow;
-        }
-        else
-        {
-            args.State = CoreWebView2PermissionState.Default;
+            case WM_EXITSIZEMOVE:
+                OnMoveResizeFinished();
+                break;
         }
 
-        args.Handled = true;
+        return CallWindowProc(oldWndProcPtr, hwnd, msg, wParam, lParam);
     }
 
     private async void OnMoveResizeFinished()
@@ -132,18 +110,6 @@ public sealed partial class WidgetWindow : Window
         Debug.WriteLine($"Move/resize finished: X={pos.X}, Y={pos.Y}, W={rect.Width}, H={rect.Height}");
 
         await _widgetManager.SaveWidgetAsync(_widget, false);
-    }
-
-    private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
-    {
-        switch (msg)
-        {
-            case WM_EXITSIZEMOVE:
-                OnMoveResizeFinished();
-                break;
-        }
-
-        return CallWindowProc(oldWndProcPtr, hwnd, msg, wParam, lParam);
     }
 
     public void SetDraggable(bool showFrame)

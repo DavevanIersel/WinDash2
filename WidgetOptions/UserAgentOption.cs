@@ -1,0 +1,39 @@
+using Microsoft.Web.WebView2.Core;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using WinDash2.Models;
+
+namespace WinDash2.WidgetOptions;
+
+public class UserAgentOption : IWidgetOption
+{
+    public void Apply(Widget widget, CoreWebView2 coreWebView2)
+    {
+        if (widget.CustomUserAgent?.Count > 0)
+        {
+            coreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+
+            coreWebView2.WebResourceRequested += (sender, args) =>
+            {
+                try
+                {
+                    var uri = new Uri(args.Request.Uri);
+                    var host = uri.Host;
+
+                    var matchedUa = widget.CustomUserAgent
+                        .FirstOrDefault(ua => host.Contains(ua.Domain, StringComparison.OrdinalIgnoreCase));
+
+                    if (matchedUa != null)
+                    {
+                        args.Request.Headers.SetHeader("User-Agent", matchedUa.UserAgent);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Exception occurred: {ex.Message}");
+                }
+            };
+        }
+    }
+}
