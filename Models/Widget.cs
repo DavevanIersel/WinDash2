@@ -12,33 +12,63 @@ public class Widget : INotifyPropertyChanged
 
     private bool _enabled;
 
+    /// <summary>
+    /// Unique identifier for the widget, typically generated from the filename.
+    /// </summary>
     [JsonPropertyName("id")]
-    public Guid? Id { get; set; }                                           // Generated from filename
+    public Guid? Id { get; set; }
 
+    /// <summary>
+    /// A display name for the widget. This does not have to be unique.
+    /// </summary>
     [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;                        // A name for the widget, this does not have to be unique
+    public string Name { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The HTML page that should be loaded for a custom widget.
+    /// </summary>
     [JsonPropertyName("html")]
-    public string Html { get; set; } = string.Empty;                        // The html page that should be loaded for a custom widget
+    public string Html { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The URL which should be loaded in the widget.
+    /// </summary>
     [JsonPropertyName("url")]
-    public string Url { get; set; } = string.Empty;                         // The url which should be loaded
+    public string Url { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Horizontal position of the upper left corner of the widget.
+    /// </summary>
     [JsonPropertyName("x")]
-    public int X { get; set; }                                              // Horizontal position of the upper left corner of the widget
+    public int X { get; set; }
 
+    /// <summary>
+    /// Vertical position of the upper left corner of the widget.
+    /// </summary>
     [JsonPropertyName("y")]
-    public int Y { get; set; }                                              // Vertical position of the upper left corner of the widget
+    public int Y { get; set; }
 
+    /// <summary>
+    /// Width of the widget in pixels.
+    /// </summary>
     [JsonPropertyName("width")]
-    public int Width { get; set; }                                          // Width of the widget
+    public int Width { get; set; }
 
+    /// <summary>
+    /// Height of the widget in pixels.
+    /// </summary>
     [JsonPropertyName("height")]
-    public int Height { get; set; }                                         // Height of the widget
+    public int Height { get; set; }
 
+    /// <summary>
+    /// Indicates whether touch controls are simulated for this widget.
+    /// </summary>
     [JsonPropertyName("touchEnabled")]
-    public bool? TouchEnabled { get; set; }                                 // Indicates whether touch controls are simulated
+    public bool? TouchEnabled { get; set; }
 
+    /// <summary>
+    /// Indicates whether the widget is enabled (visible/active).
+    /// </summary>
     [JsonPropertyName("enabled")]
     public bool Enabled
     {
@@ -53,24 +83,53 @@ public class Widget : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// List of domain-to-user-agent mappings for customizing the user agent per domain.
+    /// </summary>
     [JsonPropertyName("customUserAgent")]
-    public List<UserAgentMapping>? CustomUserAgent { get; set; } = [];      // Mapping of domains to custom user agents
+    public List<UserAgentMapping>? CustomUserAgent { get; set; } = [];
 
+    /// <summary>
+    /// Mapping of permissions to auto-accept/deny for this widget.
+    /// </summary>
     [JsonPropertyName("permissions")]
-    public Dictionary<Permission, bool?> Permissions { get; set; } = new(); // Mapping of permissions to auto-accept/deny
+    public Dictionary<Permission, bool?> Permissions { get; set; } = new();
 
+    /// <summary>
+    /// Custom JavaScript code to be injected and executed on the widget page.
+    /// </summary>
     [JsonPropertyName("customScript")]
-    public string? CustomScript { get; set; } = string.Empty;               // Custom JS script loaded on widget page
+    public string? CustomScript { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Enables or disables developer tools for this widget.
+    /// </summary>
     [JsonPropertyName("devTools")]
-    public bool? DevTools { get; set; }                                     // Enable developer tools
+    public bool? DevTools { get; set; }
 
+    /// <summary>
+    /// List of URL patterns that, when matched, will force navigation to occur in the current widget/tab
+    /// instead of opening a new widget window. Supports wildcards using '*' anywhere in the pattern.
+    /// - Use "*" as the only entry to force all URLs to open in the current tab.
+    /// - Patterns are matched against the full URL using wildcard logic:
+    ///     - "*" matches any sequence of characters (e.g., "/foo/*/bar" matches "/foo/123/bar").
+    ///     - Multiple patterns can be specified; if any pattern matches, the navigation is forced in-tab.
+    /// Example:
+    ///   "forceInCurrentTab": ["/webplayer", "*/foo*", "/bar/*/baz"]
+    ///   "forceInCurrentTab": ["*"] // force all URLs in current tab
+    /// </summary>
     [JsonPropertyName("forceInCurrentTab")]
-    public List<string>? ForceInCurrentTab { get; set; } = [];              // Force these paths in widget tab
+    public List<string>? ForceInCurrentTab { get; set; } = [];
 
+    /// <summary>
+    /// The filename for the widget configuration file. Not serialized.
+    /// </summary>
     [JsonIgnore]
-    public string? FileName { get; set; }                                   // The filename for the widgetConfig
+    public string? FileName { get; set; }
 
+    /// <summary>
+    /// Returns the widget's ID or throws if it is not assigned. Not serialized.
+    /// </summary>
     [JsonIgnore]
     public Guid IdOrThrow => Id ?? throw new InvalidOperationException("Widget Id has not been assigned yet.");
 

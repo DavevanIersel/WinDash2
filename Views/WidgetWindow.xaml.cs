@@ -29,6 +29,7 @@ public sealed partial class WidgetWindow : Window
         new UserAgentOption(),
         new PermissionsOption(),
         new TouchOption(),
+        new ForceInCurrentTabOption(),
     ];
 
     public WidgetWindow(WidgetManager widgetManager, Widget widget)

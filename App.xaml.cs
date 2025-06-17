@@ -6,14 +6,22 @@ using Microsoft.UI.Xaml;
 using WinDash2.Core;
 using WinDash2.Services;
 using WinDash2.Views;
+using System.IO;
 
 namespace WinDash2;
 
 public partial class App : Application
 {
-    private Window? _window;
     private TrayManager? _trayManager;
     public static IHost AppHost { get; private set; }
+    static readonly string WIDGETS_PATH = Path.Combine(
+       Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+       "WinDash2",
+#if DEBUG
+       "dev",
+#endif
+       "widgets"
+   );
 
     public App()
     {
@@ -22,17 +30,10 @@ public partial class App : Application
         AppHost = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
-                // Register services
-                services.AddSingleton<WidgetFileSystemService>(provider =>
-                    new WidgetFileSystemService("C:\\Users\\davei\\AppData\\Roaming\\windash2\\widgets"));
-
-                // Register core managers
+                services.AddSingleton(provider =>
+                    new WidgetFileSystemService(WIDGETS_PATH));
                 services.AddSingleton<WidgetManager>();
-
-                // Register views
                 services.AddTransient<ManagerWindow>();
-
-                // Register TrayManager with factory for ManagerWindow
                 services.AddSingleton(provider =>
                     new TrayManager(() => provider.GetRequiredService<ManagerWindow>(),
                     provider.GetRequiredService<WidgetManager>()));
@@ -47,11 +48,7 @@ public partial class App : Application
             var widgetManager = AppHost.Services.GetRequiredService<WidgetManager>();
             widgetManager.Initialize();
 
-            // Start tray manager (creates tray icon)
             _trayManager = AppHost.Services.GetRequiredService<TrayManager>();
-
-            // Do not show any main window on startup
-            // Widgets will launch themselves, no taskbar or tray icon for them
         }
         catch (Exception ex)
         {
