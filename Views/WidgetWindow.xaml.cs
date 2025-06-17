@@ -16,45 +16,36 @@ namespace WinDash2.Views;
 
 public sealed partial class WidgetWindow : Window
 {
-    private AppWindow appWindow;
-    private IntPtr hWnd;
+    private readonly AppWindow appWindow;
+    private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+    private readonly IntPtr oldWndProcPtr;
+    private readonly WndProcDelegate newWndProc;
 
     private readonly Widget _widget;
     private readonly WidgetManager _widgetManager;
 
-    // For subclassing window proc
-    private IntPtr oldWndProcPtr;
-    private WndProcDelegate newWndProc;
-
-    private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-
     private const int WM_EXITSIZEMOVE = 0x0232;
+    private const int GWLP_WNDPROC = -4;
 
-    private readonly IWidgetOption[] options = new IWidgetOption[]
-    {
+    private readonly IWidgetOption[] options =
+    [
         new UserAgentOption(),
         new PermissionsOption(),
-        // new TouchOption(),
-        // new PermissionsOption(),
-        // etc.
-    };
+    ];
 
     public WidgetWindow(WidgetManager widgetManager, Widget widget)
     {
-        this.InitializeComponent();
+        InitializeComponent();
 
         _widget = widget;
         _widgetManager = widgetManager;
 
-        hWnd = WindowNative.GetWindowHandle(this);
+        var hWnd = WindowNative.GetWindowHandle(this);
         var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
         appWindow = AppWindow.GetFromWindowId(windowId);
-
-        appWindow.MoveAndResize(new Windows.Graphics.RectInt32(widget.X, widget.Y, widget.Width, widget.Height));
-
-        appWindow.IsShownInSwitchers = false;
         newWndProc = WndProc;
         oldWndProcPtr = SetWindowLongPtr(hWnd, GWLP_WNDPROC, Marshal.GetFunctionPointerForDelegate(newWndProc));
+
         InitializeWindow();
     }
 
@@ -62,6 +53,9 @@ public sealed partial class WidgetWindow : Window
     {
         SetupTitleBar();
         SetDraggable(false);
+
+        appWindow.MoveAndResize(new Windows.Graphics.RectInt32(_widget.X, _widget.Y, _widget.Width, _widget.Height));
+        appWindow.IsShownInSwitchers = false;
 
         await WidgetWebView.EnsureCoreWebView2Async();
 
@@ -76,40 +70,13 @@ public sealed partial class WidgetWindow : Window
 
     private void SetupTitleBar()
     {
-        this.ExtendsContentIntoTitleBar = true;
+        ExtendsContentIntoTitleBar = true;
 
         if (appWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.IsMaximizable = false;
             presenter.IsMinimizable = false;
         }
-    }
-
-    private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
-    {
-        switch (msg)
-        {
-            case WM_EXITSIZEMOVE:
-                OnMoveResizeFinished();
-                break;
-        }
-
-        return CallWindowProc(oldWndProcPtr, hwnd, msg, wParam, lParam);
-    }
-
-    private async void OnMoveResizeFinished()
-    {
-        var rect = appWindow.Size;
-        var pos = appWindow.Position;
-
-        _widget.X = pos.X;
-        _widget.Y = pos.Y;
-        _widget.Width = rect.Width;
-        _widget.Height = rect.Height;
-
-        Debug.WriteLine($"Move/resize finished: X={pos.X}, Y={pos.Y}, W={rect.Width}, H={rect.Height}");
-
-        await _widgetManager.SaveWidgetAsync(_widget, false);
     }
 
     public void SetDraggable(bool showFrame)
@@ -132,9 +99,33 @@ public sealed partial class WidgetWindow : Window
         }
     }
 
-    // P/Invoke declarations for subclassing
+    private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
+    {
+        if (msg == WM_EXITSIZEMOVE)
+        {
+            OnMoveResizeFinished();
+        }
 
-    private const int GWLP_WNDPROC = -4;
+        return new nint();
+        //return CallWindowProc(oldWndProcPtr, hwnd, msg, wParam, lParam);
+    }
+
+    private async void OnMoveResizeFinished()
+    {
+        var rect = appWindow.Size;
+        var pos = appWindow.Position;
+
+        _widget.X = pos.X;
+        _widget.Y = pos.Y;
+        _widget.Width = rect.Width;
+        _widget.Height = rect.Height;
+
+        Debug.WriteLine($"Move/resize finished: X={pos.X}, Y={pos.Y}, W={rect.Width}, H={rect.Height}");
+
+        await _widgetManager.SaveWidgetAsync(_widget, false);
+    }
+
+    // P/Invoke declarations for subclassing
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr newProc);
