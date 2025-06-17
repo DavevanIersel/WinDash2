@@ -28,6 +28,7 @@ public sealed partial class WidgetWindow : Window
     [
         new UserAgentOption(),
         new PermissionsOption(),
+        new TouchOption(),
     ];
 
     public WidgetWindow(WidgetManager widgetManager, Widget widget)
@@ -119,8 +120,6 @@ public sealed partial class WidgetWindow : Window
 
         await _widgetManager.SaveWidgetAsync(_widget, false);
     }
-
-    // P/Invoke declarations for subclassing
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr newProc);

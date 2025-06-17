@@ -10,30 +10,31 @@ public class UserAgentOption : IWidgetOption
 {
     public void Apply(Widget widget, CoreWebView2 coreWebView2)
     {
-        if (widget.CustomUserAgent?.Count > 0)
+
+        if (widget.CustomUserAgent == null || widget.CustomUserAgent.Count == 0)
         {
-            coreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
-
-            coreWebView2.WebResourceRequested += (sender, args) =>
-            {
-                try
-                {
-                    var uri = new Uri(args.Request.Uri);
-                    var host = uri.Host;
-
-                    var matchedUa = widget.CustomUserAgent
-                        .FirstOrDefault(ua => host.Contains(ua.Domain, StringComparison.OrdinalIgnoreCase));
-
-                    if (matchedUa != null)
-                    {
-                        args.Request.Headers.SetHeader("User-Agent", matchedUa.UserAgent);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Exception occurred: {ex.Message}");
-                }
-            };
+            return;
         }
+
+        coreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+
+        coreWebView2.WebResourceRequested += (sender, args) =>
+        {
+            try
+            {
+                var uri = new Uri(args.Request.Uri);
+                var matchedUa = widget.CustomUserAgent
+                    .FirstOrDefault(ua => uri.Host.Contains(ua.Domain, StringComparison.OrdinalIgnoreCase));
+
+                if (matchedUa != null)
+                {
+                    args.Request.Headers.SetHeader("User-Agent", matchedUa.UserAgent);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Exception occurred: {ex.Message}");
+            }
+        };
     }
 }

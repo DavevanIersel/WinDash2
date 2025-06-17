@@ -23,13 +23,11 @@ public sealed partial class ManagerWindow : Window
         _widgetManager = widgetManager;
         this.InitializeComponent();
 
-        // Load all widgets into _allWidgets
         foreach (var widget in widgetManager.GetWidgets())
         {
             _allWidgets.Add(widget);
         }
 
-        // Initially, copy all to filtered view
         ApplyFilter("");
 
         _isInitialized = true;
@@ -39,7 +37,6 @@ public sealed partial class ManagerWindow : Window
     {
         var lower = query.ToLowerInvariant();
 
-        // Clear and repopulate FilteredWidgets
         FilteredWidgets.Clear();
 
         foreach (var widget in _allWidgets.Where(w => w.Name.ToLowerInvariant().Contains(lower)))

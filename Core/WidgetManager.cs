@@ -31,10 +31,10 @@ public class WidgetManager
             _widgetConfigs[widget.IdOrThrow] = widget;
             CreateOrUpdateWidgetWindow(widget);
         }
-        //move_externa_windows_experiment();
+        //move_external_windows_experiment();
     }
 
-    //private void move_externa_windows_experiment()
+    //private void move_external_windows_experiment()
     //{
     //    [DllImport("user32.dll")]
     //    static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
