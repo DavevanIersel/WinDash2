@@ -1,13 +1,15 @@
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using WinDash2.Models;
+using WinDash2.Views;
 
 namespace WinDash2.WidgetOptions;
 
 public class HideScrollbarOption : IWidgetOption
 {
-    public void Apply(Widget widget, CoreWebView2 coreWebView2)
+    public void Apply(Widget widget, WebView2 webView)
     {
-        coreWebView2.DOMContentLoaded += (sender, args) =>
+        webView.CoreWebView2.DOMContentLoaded += (sender, args) =>
         {
             string script = @"
                 (function() {
@@ -18,7 +20,7 @@ public class HideScrollbarOption : IWidgetOption
                     document.head.appendChild(style);
                 })();
             ";
-            _ = coreWebView2.ExecuteScriptAsync(script);
+            _ = webView.CoreWebView2.ExecuteScriptAsync(script);
         };
     }
 }

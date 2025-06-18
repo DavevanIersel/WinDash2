@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Diagnostics;
@@ -8,7 +9,7 @@ namespace WinDash2.WidgetOptions;
 
 public class UserAgentOption : IWidgetOption
 {
-    public void Apply(Widget widget, CoreWebView2 coreWebView2)
+    public void Apply(Widget widget, WebView2 webView)
     {
 
         if (widget.CustomUserAgent == null || widget.CustomUserAgent.Count == 0)
@@ -16,9 +17,9 @@ public class UserAgentOption : IWidgetOption
             return;
         }
 
-        coreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+        webView.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
 
-        coreWebView2.WebResourceRequested += (sender, args) =>
+        webView.CoreWebView2.WebResourceRequested += (sender, args) =>
         {
             try
             {

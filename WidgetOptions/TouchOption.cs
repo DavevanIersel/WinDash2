@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Diagnostics;
@@ -8,11 +9,11 @@ namespace WinDash2.WidgetOptions;
 
 public class TouchOption : IWidgetOption
 {
-    public void Apply(Widget widget, CoreWebView2 coreWebView2)
+    public void Apply(Widget widget, WebView2 webView)
     {
         if (widget.TouchEnabled == true)
         {
-            _ = EnableTouchAsync(coreWebView2);
+            _ = EnableTouchAsync(webView.CoreWebView2);
         }
     }
 

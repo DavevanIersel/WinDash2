@@ -61,7 +61,7 @@ public sealed partial class WidgetWindow : Window
 
         foreach (var option in options)
         {
-            option.Apply(_widget, WidgetWebView.CoreWebView2);
+            option.Apply(_widget, WidgetWebView);
         }
 
         this.Closed += OnWindowClosed;

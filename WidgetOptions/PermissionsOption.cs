@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Diagnostics;
@@ -9,9 +10,9 @@ namespace WinDash2.WidgetOptions;
 // This was a custom solution we needed for the Electron implmemtation. There are very minor positives for example when sharing widgets, or reinstalling Edge, but also potential security vulnerabilities.
 public class PermissionsOption : IWidgetOption
 {
-    public void Apply(Widget widget, CoreWebView2 coreWebView2)
+    public void Apply(Widget widget, WebView2 webView)
     {
-        coreWebView2.PermissionRequested += (sender, args) =>
+        webView.CoreWebView2.PermissionRequested += (sender, args) =>
         {
             if (TryMapPermission(args.PermissionKind, out var permissionKey))
             {

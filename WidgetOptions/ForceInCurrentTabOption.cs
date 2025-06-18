@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using System;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace WinDash2.WidgetOptions;
 
 public class ForceInCurrentTabOption : IWidgetOption
 {
-    public void Apply(Widget widget, CoreWebView2 coreWebView2)
+    public void Apply(Widget widget, WebView2 webView)
     {
         var forceList = widget.ForceInCurrentTab;
         if (forceList == null || forceList.Count == 0)
@@ -23,7 +24,7 @@ public class ForceInCurrentTabOption : IWidgetOption
             .Select(p => "^" + Regex.Escape(p).Replace("\\*", ".*") + "$")
             .ToList();
 
-        coreWebView2.NewWindowRequested += (sender, args) =>
+        webView.CoreWebView2.NewWindowRequested += (sender, args) =>
         {
             if (patterns.Any(pattern => args.Uri != null && Regex.IsMatch(args.Uri, pattern, RegexOptions.IgnoreCase)))
             {
