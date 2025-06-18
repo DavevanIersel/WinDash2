@@ -30,6 +30,7 @@ public sealed partial class WidgetWindow : Window
         new PermissionsOption(),
         new TouchOption(),
         new ForceInCurrentTabOption(),
+        new HideScrollbarOption(),
     ];
 
     public WidgetWindow(WidgetManager widgetManager, Widget widget)
