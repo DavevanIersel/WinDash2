@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -56,14 +58,14 @@ public class WidgetManager
 
         if (_widgetWindows.TryGetValue(widget.IdOrThrow, out var existingWindow))
         {
-            window = existingWindow;
-            if (!widget.Enabled)
-            {
-                existingWindow.Close();
-                _widgetWindows.Remove(widget.IdOrThrow);
-                return;
-            }
-            //existingWindow.UpdateWidget(widget);
+            bool enabled = widget.Enabled;
+
+            existingWindow.Close();
+            _widgetWindows.Remove(widget.IdOrThrow);
+
+            if (!enabled) return;
+
+            window = CreateWidgetWindow(widget);
         }
         else
         {
@@ -71,14 +73,20 @@ public class WidgetManager
             {
                 return;
             }
-            var widgetWindow = new WidgetWindow(this, widget);
-            window = widgetWindow;
 
-            _widgetWindows[widget.IdOrThrow] = widgetWindow;
+            window = CreateWidgetWindow(widget);
         }
 
         window.Activate();
         window.SetDraggable(_isDraggable);
+    }
+
+    private WidgetWindow CreateWidgetWindow(Widget widget)
+    {
+        var widgetWindow = new WidgetWindow(this, widget);
+
+        _widgetWindows[widget.IdOrThrow] = widgetWindow;
+        return widgetWindow;
     }
 
     public void SetDraggable(bool draggable)
@@ -90,15 +98,18 @@ public class WidgetManager
         }
     }
 
-    public async Task SaveWidgetAsync(Widget widget, bool rerender)
+    public void SaveWidget(Widget widget, bool rerender)
     {
-        await _widgetFileSystemService.SaveWidgetAsync(widget);
         _widgetConfigs[widget.IdOrThrow] = widget;
 
         if (rerender)
         {
+            Debug.WriteLine($"Rerendering {widget.Name}");
             CreateOrUpdateWidgetWindow(widget);
         }
+
+        Debug.WriteLine($"Saving {widget.Name}");
+        _widgetFileSystemService.SaveWidget(widget);
     }
 
     public IReadOnlyCollection<Widget> GetWidgets() => _widgetConfigs.Values.ToList().AsReadOnly();

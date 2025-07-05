@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="WinDash2.Views.WidgetLibraryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinDash2.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:WinDash2.Models"
+    xmlns:tableView="using:WinUI.TableView">
+
+    <StackPanel Padding="20">
+        <TextBlock Text="Widget Library" FontSize="24" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBox PlaceholderText="Search widgets..." Margin="0,0,0,10" TextChanged="SearchBox_TextChanged"/>
+        <tableView:TableView
+            ItemsSource="{x:Bind FilteredWidgets}"
+            AutoGenerateColumns="False"
+            SelectionMode="None"
+            CanResizeColumns="False"
+            CanSortColumns="True"
+            Height="500">
+
+            <tableView:TableView.Columns>
+                <tableView:TableViewTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
+                <tableView:TableViewTemplateColumn Header="Enabled" Width="Auto">
+                    <tableView:TableViewTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="models:Widget">
+                            <ToggleSwitch Loading="ToggleSwitch_Loading" Toggled="ToggleSwitch_Toggled"/>
+
+                        </DataTemplate>
+                    </tableView:TableViewTemplateColumn.CellTemplate>
+                </tableView:TableViewTemplateColumn>
+                <tableView:TableViewTemplateColumn Header="Actions" Width="Auto">
+                    <tableView:TableViewTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="models:Widget">
+                            <Button Content="Edit" Click="EditButton_Click"/>
+                        </DataTemplate>
+                    </tableView:TableViewTemplateColumn.CellTemplate>
+                </tableView:TableViewTemplateColumn>
+            </tableView:TableView.Columns>
+        </tableView:TableView>
+    </StackPanel>
+</Page>

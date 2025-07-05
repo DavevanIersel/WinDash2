@@ -34,6 +34,8 @@ public partial class App : Application
                     new WidgetFileSystemService(WIDGETS_PATH));
                 services.AddSingleton<WidgetManager>();
                 services.AddTransient<ManagerWindow>();
+                services.AddTransient<WidgetLibraryPage>();
+                services.AddTransient<WidgetEditPage>();
                 services.AddSingleton(provider =>
                     new TrayManager(() => provider.GetRequiredService<ManagerWindow>(),
                     provider.GetRequiredService<WidgetManager>()));

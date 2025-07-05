@@ -80,7 +80,7 @@ public class WidgetFileSystemService
     }
 
 
-    public async Task SaveWidgetAsync(Widget widget)
+    public void SaveWidget(Widget widget)
     {
         ArgumentNullException.ThrowIfNull(widget.FileName);
 
@@ -89,7 +89,7 @@ public class WidgetFileSystemService
         if (widgetFilePath != null)
         {
             using var stream = File.Create(widgetFilePath);
-            await JsonSerializer.SerializeAsync(stream, widget, _jsonOptions);
+            JsonSerializer.SerializeAsync(stream, widget, _jsonOptions);
         }
         else
         {

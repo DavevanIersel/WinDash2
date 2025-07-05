@@ -94,10 +94,10 @@ public sealed partial class WidgetWindow : Window
         }
     }
 
-    private async void OnWindowClosed(object sender, WindowEventArgs args)
+    private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         _widget.Enabled = false;
-        await _widgetManager.SaveWidgetAsync(_widget, false);
+        _widgetManager.SaveWidget(_widget, false);
     }
 
     private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
@@ -110,7 +110,7 @@ public sealed partial class WidgetWindow : Window
         return CallWindowProc(oldWndProcPtr, hwnd, msg, wParam, lParam);
     }
 
-    private async void OnMoveResizeFinished()
+    private void OnMoveResizeFinished()
     {
         var rect = appWindow.Size;
         var pos = appWindow.Position;
@@ -120,7 +120,7 @@ public sealed partial class WidgetWindow : Window
         _widget.Width = rect.Width;
         _widget.Height = rect.Height;
 
-        await _widgetManager.SaveWidgetAsync(_widget, false);
+        _widgetManager.SaveWidget(_widget, false);
     }
 
     [DllImport("user32.dll", SetLastError = true)]

@@ -14,6 +14,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\ManagerWindow.xaml" />
+    <None Remove="Views\WidgetEditPage.xaml" />
+    <None Remove="Views\WidgetLibraryPage.xaml" />
     <None Remove="Views\WidgetWindow.xaml" />
   </ItemGroup>
 
@@ -55,6 +57,16 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250606001" />
     <PackageReference Include="WinUI.TableView" Version="1.2.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\WidgetEditPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\WidgetLibraryPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\WidgetWindow.xaml">
