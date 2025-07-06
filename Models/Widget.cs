@@ -11,6 +11,11 @@ public class Widget : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private bool _enabled;
+    private string _name = string.Empty;
+    private string _url = string.Empty;
+    private string _html = string.Empty;
+    private int _width;
+    private int _height;
 
     /// <summary>
     /// Unique identifier for the widget, typically generated from the filename.
@@ -22,19 +27,31 @@ public class Widget : INotifyPropertyChanged
     /// A display name for the widget. This does not have to be unique.
     /// </summary>
     [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;
+    public string Name
+    {
+        get => _name;
+        set => SetProperty(ref _name, value);
+    }
 
     /// <summary>
     /// The HTML page that should be loaded for a custom widget.
     /// </summary>
     [JsonPropertyName("html")]
-    public string Html { get; set; } = string.Empty;
+    public string Html
+    {
+        get => _html;
+        set => SetProperty(ref _html, value);
+    }
 
     /// <summary>
     /// The URL which should be loaded in the widget.
     /// </summary>
     [JsonPropertyName("url")]
-    public string Url { get; set; } = string.Empty;
+    public string Url
+    {
+        get => _url;
+        set => SetProperty(ref _url, value);
+    }
 
     /// <summary>
     /// Horizontal position of the upper left corner of the widget.
@@ -52,13 +69,21 @@ public class Widget : INotifyPropertyChanged
     /// Width of the widget in pixels.
     /// </summary>
     [JsonPropertyName("width")]
-    public int Width { get; set; }
+    public int Width
+    {
+        get => _width;
+        set => SetProperty(ref _width, value);
+    }
 
     /// <summary>
     /// Height of the widget in pixels.
     /// </summary>
     [JsonPropertyName("height")]
-    public int Height { get; set; }
+    public int Height
+    {
+        get => _height;
+        set => SetProperty(ref _height, value);
+    }
 
     /// <summary>
     /// Indicates whether touch controls are simulated for this widget.
@@ -136,5 +161,16 @@ public class Widget : INotifyPropertyChanged
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (!EqualityComparer<T>.Default.Equals(field, value))
+        {
+            field = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+        return false;
     }
 }
