@@ -8,6 +8,8 @@ using System.Diagnostics;
 using WinDash2.Core;
 using WinDash2.Models;
 using WinDash2.WidgetOptions;
+using WinDash2.WidgetOptions.FunctionKeyActions;
+using WinDash2.WidgetOptions.HideScrollbarOption;
 using Windows.Foundation;
 using Windows.UI.WebUI;
 
@@ -26,6 +28,7 @@ public sealed partial class WidgetEditPage : Page
 
     private static readonly IWidgetOption[] Options =
     [
+        new FunctionKeyActions(),
         new UserAgentOption(),
         new PermissionsOption(),
         new TouchOption(),
