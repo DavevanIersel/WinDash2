@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using System;
@@ -9,7 +10,7 @@ namespace WinDash2.WidgetOptions;
 
 public class ForceInCurrentTabOption : IWidgetOption
 {
-    public void Apply(Widget widget, WebView2 webView)
+    public void Apply(Widget widget, WebView2 webView, Window? window)
     {
         var forceList = widget.ForceInCurrentTab;
         if (forceList == null || forceList.Count == 0)

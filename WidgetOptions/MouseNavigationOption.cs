@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using WinDash2.Models;
@@ -6,7 +7,7 @@ namespace WinDash2.WidgetOptions;
 
 public class MouseNavigationOption : IWidgetOption
 {
-    public void Apply(Widget widget, WebView2 webView)
+    public void Apply(Widget widget, WebView2 webView, Window? window)
     {
         webView.PointerPressed += WebView_PointerPressed;
     }
