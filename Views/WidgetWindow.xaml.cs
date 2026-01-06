@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using WinDash2.Core;
 using WinDash2.Models;
 using WinDash2.WidgetOptions;
+using WinDash2.WidgetOptions.FunctionKeyActions;
+using WinDash2.WidgetOptions.HideScrollbarOption;
 using WinRT.Interop;
 
 namespace WinDash2.Views;
@@ -26,6 +28,7 @@ public sealed partial class WidgetWindow : Window
 
     private readonly IWidgetOption[] options =
     [
+        new FunctionKeyActions(),
         new UserAgentOption(),
         new PermissionsOption(),
         new TouchOption(),
