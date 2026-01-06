@@ -8,7 +8,7 @@ public class KeyboardEventMessage
     public KeyboardEventType Type { get; set; }
     
     [JsonPropertyName("code")]
-    public KeyCode Code { get; set; }
+    public string Code { get; set; }
     
     [JsonPropertyName("timestamp")]
     public long Timestamp { get; set; }

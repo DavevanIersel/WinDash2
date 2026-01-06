@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using WinDash2.Models;
@@ -7,7 +8,7 @@ namespace WinDash2.WidgetOptions.HideScrollbarOption;
 
 public class HideScrollbarOption : IWidgetOption
 {
-    public void Apply(Widget widget, WebView2 webView)
+    public void Apply(Widget widget, WebView2 webView, Window? window)
     {
         webView.CoreWebView2.DOMContentLoaded += async (sender, args) =>
         {

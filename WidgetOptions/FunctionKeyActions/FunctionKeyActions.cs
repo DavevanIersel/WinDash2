@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
@@ -9,8 +10,15 @@ namespace WinDash2.WidgetOptions.FunctionKeyActions;
 
 public class FunctionKeyActions : IWidgetOption
 {
-    public void Apply(Widget widget, WebView2 webView)
+    private FullscreenManagerService? _fullscreenManager;
+
+    public void Apply(Widget widget, WebView2 webView, Window? window)
     {
+        if (window != null)
+        {
+            _fullscreenManager = new FullscreenManagerService(window);
+        }
+
         webView.CoreWebView2.DOMContentLoaded += async (sender, args) =>
         {
             var script = await JavaScriptSrcLoader.GetSrcFileContentsByResourceNameAsync(
@@ -26,10 +34,20 @@ public class FunctionKeyActions : IWidgetOption
                 var messageJson = args.TryGetWebMessageAsString();
                 var keyboardEvent = JsonSerializer.Deserialize<KeyboardEventMessage>(messageJson);
 
-                if (keyboardEvent?.Type == KeyboardEventType.Keydown &&
-                    keyboardEvent.Code == KeyCode.F1)
+                if (keyboardEvent?.Type == KeyboardEventType.Keydown)
                 {
-                    OpenWidgetInPreferredBrowser(widget);
+                    switch (keyboardEvent.Code)
+                    {
+                        case "F1":
+                            BrowserUtils.OpenInDefaultBrowser(widget);
+                            break;
+                        case "F11":
+                            _fullscreenManager?.ToggleFullscreen();
+                            break;
+                        case "Escape":
+                            _fullscreenManager?.ExitFullscreen();
+                            break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -37,28 +55,5 @@ public class FunctionKeyActions : IWidgetOption
                 Debug.WriteLine($"Error processing web message: {ex.Message}");
             }
         };
-    }
-
-    private static void OpenWidgetInPreferredBrowser(Widget widget)
-    {
-        if (!Uri.TryCreate(widget.Url, UriKind.Absolute, out var uri))
-        {
-            Debug.WriteLine($"Invalid widget URL: {widget.Url}");
-            return;
-        }
-
-        // Allow only web URLs
-        if (uri.Scheme != Uri.UriSchemeHttp &&
-            uri.Scheme != Uri.UriSchemeHttps)
-        {
-            Debug.WriteLine($"Blocked non-web URL scheme: {uri.Scheme}");
-            return;
-        }
-
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = uri.AbsoluteUri,
-            UseShellExecute = true
-        });
     }
 }

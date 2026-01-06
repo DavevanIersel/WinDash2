@@ -61,7 +61,7 @@ public sealed partial class WidgetEditPage : Page
         {
             foreach (var option in Options)
             {
-                option.Apply(Widget, PreviewWebView);
+                option.Apply(Widget, PreviewWebView, null);
             }
         };
 
@@ -92,6 +92,7 @@ public sealed partial class WidgetEditPage : Page
         _widgetManager.SaveWidget(Widget, true);
         Frame.GoBack();
     }
+
     private void Widget_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         Debug.WriteLine("Changed");
