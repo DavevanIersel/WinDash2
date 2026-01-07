@@ -94,7 +94,7 @@ public class SettingsService
 
     public void UpdateGridSize(int gridSize)
     {
-        _settings.GridSize = Math.Max(1, Math.Min(500, gridSize)); // Clamp between 1 and 500
+        _settings.GridSize = gridSize;
         SaveSettings(_settings);
     }
 }

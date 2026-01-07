@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.UI.Windowing;
 using WinDash2.Models;
@@ -10,7 +9,6 @@ namespace WinDash2.Services;
 
 public class GridService
 {
-    private const int DefaultCellSize = 60;
     private const int WindowBorderOffset = 7; // Windows 11 border size
     
     private readonly SettingsService _settingsService;
@@ -22,8 +20,6 @@ public class GridService
     }
 
     public bool IsGridEnabled => _settingsService.GetSettings().DragMode == DragMode.GridBased;
-
-    public int CellSize => _settingsService.GetSettings().GridSize;
 
     #region Grid Transform calculations
     
@@ -40,7 +36,7 @@ public class GridService
     /// <summary>
     /// Gets the monitor that contains the given point
     /// </summary>
-    private DisplayArea GetDisplayAreaForPoint(int x, int y)
+    private static DisplayArea GetDisplayAreaForPoint(int x, int y)
     {
         var displayAreas = DisplayArea.FindAll();
         
@@ -62,7 +58,7 @@ public class GridService
     /// <summary>
     /// Gets the monitor where the mouse cursor currently is
     /// </summary>
-    private DisplayArea GetDisplayAreaForCursor()
+    private static DisplayArea GetDisplayAreaForCursor()
     {
         POINT cursorPos;
         GetCursorPos(out cursorPos);
@@ -91,7 +87,7 @@ public class GridService
         int relativeY = y - monitorOriginY;
 
         // Snap to grid relative to monitor
-        int cellSize = CellSize;
+        int cellSize = _settingsService.GetSettings().GridSize;
         int snappedRelativeX = (int)Math.Round((double)relativeX / cellSize) * cellSize;
         int snappedRelativeY = (int)Math.Round((double)relativeY / cellSize) * cellSize;
 
@@ -109,7 +105,7 @@ public class GridService
             return (width, height);
         }
 
-        int cellSize = CellSize;
+        int cellSize = _settingsService.GetSettings().GridSize;
         int snappedWidth = Math.Max(cellSize, (int)Math.Round((double)width / cellSize) * cellSize);
         int snappedHeight = Math.Max(cellSize, (int)Math.Round((double)height / cellSize) * cellSize);
 
@@ -182,7 +178,7 @@ public class GridService
         
         if (_gridOverlayWindow == null)
         {
-            _gridOverlayWindow = new GridOverlayWindow(this);
+            _gridOverlayWindow = new GridOverlayWindow(_settingsService);
             _gridOverlayWindow.Closed += (s, e) => _gridOverlayWindow = null;
         }
     }

@@ -15,7 +15,7 @@ public sealed partial class GridOverlayWindow : Window
 {
     private readonly AppWindow _appWindow;
     private readonly IntPtr _hWnd;
-    private readonly GridService _gridService;
+    private readonly SettingsService _settingsService;
     private DisplayArea? _currentDisplay;
     
     private const int WS_EX_TRANSPARENT = 0x00000020;
@@ -29,11 +29,11 @@ public sealed partial class GridOverlayWindow : Window
     private const uint SWP_NOSIZE = 0x0001;
     private const uint SWP_NOACTIVATE = 0x0010;
 
-    public GridOverlayWindow(GridService gridService)
+    public GridOverlayWindow(SettingsService settingsService)
     {
         InitializeComponent();
         
-        _gridService = gridService;
+        _settingsService = settingsService;
         _hWnd = WindowNative.GetWindowHandle(this);
         var windowId = Win32Interop.GetWindowIdFromWindow(_hWnd);
         _appWindow = AppWindow.GetFromWindowId(windowId);
@@ -127,10 +127,10 @@ public sealed partial class GridOverlayWindow : Window
     {
         GridLinesCanvas.Children.Clear();
 
-        int cellSize = _gridService.CellSize;
+        int gridSize = _settingsService.GetSettings().GridSize;
         var strokeBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(60, 255, 255, 255));
         
-        for (int x = 0; x <= screenWidth; x += cellSize)
+        for (int x = 0; x <= screenWidth; x += gridSize)
         {
             var line = new Line
             {
@@ -144,7 +144,7 @@ public sealed partial class GridOverlayWindow : Window
             GridLinesCanvas.Children.Add(line);
         }
 
-        for (int y = 0; y <= screenHeight; y += cellSize)
+        for (int y = 0; y <= screenHeight; y += gridSize)
         {
             var line = new Line
             {
