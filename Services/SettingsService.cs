@@ -91,4 +91,10 @@ public class SettingsService
         _settings.DragMode = dragMode;
         SaveSettings(_settings);
     }
+
+    public void UpdateGridSize(int gridSize)
+    {
+        _settings.GridSize = Math.Max(1, Math.Min(500, gridSize)); // Clamp between 1 and 500
+        SaveSettings(_settings);
+    }
 }

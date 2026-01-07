@@ -1,5 +1,6 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Windows.Graphics;
 using WinDash2.Models;
 using WinDash2.Services;
@@ -11,11 +12,13 @@ namespace WinDash2.Views;
 public sealed partial class SettingsWindow : Window
 {
     private readonly SettingsService _settingsService;
+    private readonly GridService _gridService;
 
-    public SettingsWindow(SettingsService settingsService)
+    public SettingsWindow(SettingsService settingsService, GridService gridService)
     {
         InitializeComponent();
         _settingsService = settingsService;
+        _gridService = gridService;
 
         SetWindowSize();
 
@@ -29,6 +32,8 @@ public sealed partial class SettingsWindow : Window
         {
             GridBasedRadioButton.IsChecked = true;
         }
+
+        GridSizeNumberBox.Value = settings.GridSize;
     }
 
     private void SetWindowSize()
@@ -37,7 +42,7 @@ public sealed partial class SettingsWindow : Window
         var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
         var appWindow = AppWindow.GetFromWindowId(windowId);
         
-        appWindow.Resize(new SizeInt32(600, 400));
+        appWindow.Resize(new SizeInt32(800, 600));
     }
 
     private void OnDragModeChanged(object sender, RoutedEventArgs e)
@@ -47,5 +52,13 @@ public sealed partial class SettingsWindow : Window
             : DragMode.GridBased;
 
         _settingsService.UpdateDragMode(dragMode);
+    }
+
+    private void OnGridSizeChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    {
+        if (!double.IsNaN(args.NewValue))
+        {
+            _settingsService.UpdateGridSize((int)args.NewValue);
+        }
     }
 }

@@ -15,7 +15,6 @@ public class GridService
     
     private readonly SettingsService _settingsService;
     private GridOverlayWindow? _gridOverlayWindow;
-    private int _cellSize = DefaultCellSize;
 
     public GridService(SettingsService settingsService)
     {
@@ -24,11 +23,7 @@ public class GridService
 
     public bool IsGridEnabled => _settingsService.GetSettings().DragMode == DragMode.GridBased;
 
-    public int CellSize
-    {
-        get => _cellSize;
-        set => _cellSize = value > 0 ? value : DefaultCellSize;
-    }
+    public int CellSize => _settingsService.GetSettings().GridSize;
 
     #region Grid Transform calculations
     
@@ -96,8 +91,9 @@ public class GridService
         int relativeY = y - monitorOriginY;
 
         // Snap to grid relative to monitor
-        int snappedRelativeX = (int)Math.Round((double)relativeX / _cellSize) * _cellSize;
-        int snappedRelativeY = (int)Math.Round((double)relativeY / _cellSize) * _cellSize;
+        int cellSize = CellSize;
+        int snappedRelativeX = (int)Math.Round((double)relativeX / cellSize) * cellSize;
+        int snappedRelativeY = (int)Math.Round((double)relativeY / cellSize) * cellSize;
 
         // Convert back to global coordinates
         int snappedX = snappedRelativeX + monitorOriginX;
@@ -113,8 +109,9 @@ public class GridService
             return (width, height);
         }
 
-        int snappedWidth = Math.Max(_cellSize, (int)Math.Round((double)width / _cellSize) * _cellSize);
-        int snappedHeight = Math.Max(_cellSize, (int)Math.Round((double)height / _cellSize) * _cellSize);
+        int cellSize = CellSize;
+        int snappedWidth = Math.Max(cellSize, (int)Math.Round((double)width / cellSize) * cellSize);
+        int snappedHeight = Math.Max(cellSize, (int)Math.Round((double)height / cellSize) * cellSize);
 
         return (snappedWidth, snappedHeight);
     }

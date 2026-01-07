@@ -70,6 +70,28 @@
                         </RadioButton>
                     </StackPanel>
                 </StackPanel>
+
+                <StackPanel Spacing="8">
+                    <TextBlock 
+                        Text="Grid Size" 
+                        Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    
+                    <StackPanel Spacing="8" Margin="0,8,0,0">
+                        <NumberBox 
+                            x:Name="GridSizeNumberBox"
+                            Header="Cell Size (pixels)"
+                            SpinButtonPlacementMode="Inline"
+                            Minimum="10"
+                            Maximum="500"
+                            SmallChange="10"
+                            LargeChange="50"
+                            ValueChanged="OnGridSizeChanged"/>
+                        <TextBlock 
+                            Text="Size of each grid cell for snapping widgets"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            TextWrapping="Wrap"/>
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
         </ScrollViewer>
     </Grid>
