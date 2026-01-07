@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics;
+using System.Linq;
+using Microsoft.UI.Windowing;
 using WinDash2.Models;
 using WinDash2.Views;
 
@@ -6,7 +9,7 @@ namespace WinDash2.Services;
 
 public class GridService
 {
-    private const int DefaultCellSize = 50;
+    private const int DefaultCellSize = 60;
     private const int WindowBorderOffset = 7; // Windows 11 border size
     
     private readonly SettingsService _settingsService;
@@ -27,6 +30,32 @@ public class GridService
     }
 
     #region Grid Transform calculations
+    
+    /// <summary>
+    /// Gets the monitor that contains the given point
+    /// </summary>
+    private DisplayArea GetDisplayAreaForPoint(int x, int y)
+    {
+        var displayAreas = DisplayArea.FindAll();
+        
+        for (int i = 0; i < displayAreas.Count; i++)
+        {
+            var display = displayAreas[i];
+            if (x >= display.WorkArea.X && 
+                x < display.WorkArea.X + display.WorkArea.Width &&
+                y >= display.WorkArea.Y && 
+                y < display.WorkArea.Y + display.WorkArea.Height)
+            {
+                return display;
+            }
+        }
+        
+        return DisplayArea.Primary;
+    }
+    
+    /// <summary>
+    /// Snaps coordinates to grid, relative to the monitor's origin
+    /// </summary>
     public (int x, int y) SnapToGrid(int x, int y)
     {
         if (!IsGridEnabled)
@@ -34,8 +63,22 @@ public class GridService
             return (x, y);
         }
 
-        int snappedX = (int)Math.Round((double)x / _cellSize) * _cellSize;
-        int snappedY = (int)Math.Round((double)y / _cellSize) * _cellSize;
+        // Get the monitor this position is on
+        var display = GetDisplayAreaForPoint(x, y);
+        int monitorOriginX = display.WorkArea.X;
+        int monitorOriginY = display.WorkArea.Y;
+
+        // Calculate position relative to monitor origin
+        int relativeX = x - monitorOriginX;
+        int relativeY = y - monitorOriginY;
+
+        // Snap to grid relative to monitor
+        int snappedRelativeX = (int)Math.Round((double)relativeX / _cellSize) * _cellSize;
+        int snappedRelativeY = (int)Math.Round((double)relativeY / _cellSize) * _cellSize;
+
+        // Convert back to global coordinates
+        int snappedX = snappedRelativeX + monitorOriginX;
+        int snappedY = snappedRelativeY + monitorOriginY;
 
         return (snappedX, snappedY);
     }
@@ -64,15 +107,20 @@ public class GridService
             return (x, y, width, height);
         }
 
+        Debug.WriteLine($"Snapping window bounds: x={x}, y={y}, width={width}, height={height}");
+
         // Account for window border when snapping
-        var (snappedX, snappedY) = SnapToGrid(x + WindowBorderOffset, y + WindowBorderOffset);
-        var (snappedWidth, snappedHeight) = SnapSizeToGrid(width - (WindowBorderOffset * 2), height - (WindowBorderOffset * 2));
+        var (snappedX, snappedY) = SnapToGrid(x, y);
+        var (snappedWidth, snappedHeight) = SnapSizeToGrid(width, height);
         
+        Debug.WriteLine($"Snapped window bounds: x={snappedX}, y={snappedY}, width={snappedWidth}, height={snappedHeight}");
         // Adjust back to include the border
-        int finalX = snappedX + WindowBorderOffset;
-        int finalY = snappedY - WindowBorderOffset;
-        int finalWidth = snappedWidth + WindowBorderOffset * 2;
+        int finalX = snappedX;
+        int finalY = snappedY;
+        int finalWidth = snappedWidth + WindowBorderOffset;
         int finalHeight = snappedHeight + WindowBorderOffset;
+
+        Debug.WriteLine($"Final window bounds with border: x={finalX}, y={finalY}, width={finalWidth}, height={finalHeight}");
 
         return (finalX, finalY, finalWidth, finalHeight);
     }
@@ -85,6 +133,13 @@ public class GridService
         
         EnsureOverlayCreated();
         _gridOverlayWindow?.ShowOnMonitorWithMouse();
+    }
+
+    public void UpdateOverlayPosition()
+    {
+        if (!IsGridEnabled) return;
+        
+        _gridOverlayWindow?.UpdateMonitorIfNeeded();
     }
 
     public void OnMoveResizeFinished()

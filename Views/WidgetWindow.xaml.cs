@@ -29,6 +29,7 @@ public sealed partial class WidgetWindow : Window
 
     private const int WM_EXITSIZEMOVE = 0x0232;
     private const int WM_ENTERSIZEMOVE = 0x0231;
+    private const int WM_MOVING = 0x0216;
     private const int GWLP_WNDPROC = -4;
 
     private readonly IWidgetOption[] options =
@@ -115,6 +116,10 @@ public sealed partial class WidgetWindow : Window
         {
             OnMoveResizeStarted();
         }
+        else if (msg == WM_MOVING)
+        {
+            OnMoving();
+        }
         else if (msg == WM_EXITSIZEMOVE)
         {
             OnMoveResizeFinished();
@@ -126,6 +131,11 @@ public sealed partial class WidgetWindow : Window
     private void OnMoveResizeStarted()
     {
         _gridService.OnMoveResizeStarted();
+    }
+
+    private void OnMoving()
+    {
+        _gridService.UpdateOverlayPosition();
     }
 
     private void OnMoveResizeFinished()

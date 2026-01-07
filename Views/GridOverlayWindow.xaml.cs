@@ -16,6 +16,7 @@ public sealed partial class GridOverlayWindow : Window
     private readonly AppWindow _appWindow;
     private readonly IntPtr _hWnd;
     private readonly GridService _gridService;
+    private DisplayArea? _currentDisplay;
     
     private const int WS_EX_TRANSPARENT = 0x00000020;
     private const int WS_EX_TOOLWINDOW = 0x00000080;
@@ -83,6 +84,8 @@ public sealed partial class GridOverlayWindow : Window
             }
         }
 
+        _currentDisplay = targetDisplay;
+        
         _appWindow.MoveAndResize(new RectInt32(
             targetDisplay.WorkArea.X,
             targetDisplay.WorkArea.Y,
@@ -94,6 +97,25 @@ public sealed partial class GridOverlayWindow : Window
         _appWindow.Show();
         
         SetWindowPos(_hWnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+
+    public void UpdateMonitorIfNeeded()
+    {
+        POINT cursorPos;
+        GetCursorPos(out cursorPos);
+        
+        // Check if we're still on the same monitor
+        if (_currentDisplay != null &&
+            cursorPos.X >= _currentDisplay.WorkArea.X && 
+            cursorPos.X < _currentDisplay.WorkArea.X + _currentDisplay.WorkArea.Width &&
+            cursorPos.Y >= _currentDisplay.WorkArea.Y && 
+            cursorPos.Y < _currentDisplay.WorkArea.Y + _currentDisplay.WorkArea.Height)
+        {
+            return; // Still on same monitor, no update needed
+        }
+        
+        // Mouse moved to different monitor, update overlay
+        ShowOnMonitorWithMouse();
     }
 
     public void HideOverlay()
