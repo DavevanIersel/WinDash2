@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.UI.Windowing;
 using WinDash2.Models;
 using WinDash2.Views;
@@ -31,6 +32,16 @@ public class GridService
 
     #region Grid Transform calculations
     
+    [DllImport("user32.dll")]
+    private static extern bool GetCursorPos(out POINT lpPoint);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct POINT
+    {
+        public int X;
+        public int Y;
+    }
+    
     /// <summary>
     /// Gets the monitor that contains the given point
     /// </summary>
@@ -54,7 +65,18 @@ public class GridService
     }
     
     /// <summary>
-    /// Snaps coordinates to grid, relative to the monitor's origin
+    /// Gets the monitor where the mouse cursor currently is
+    /// </summary>
+    private DisplayArea GetDisplayAreaForCursor()
+    {
+        POINT cursorPos;
+        GetCursorPos(out cursorPos);
+        return GetDisplayAreaForPoint(cursorPos.X, cursorPos.Y);
+    }
+    
+    /// <summary>
+    /// Snaps coordinates to grid, relative to the monitor's origin.
+    /// Uses the cursor position to determine which monitor's grid to align to.
     /// </summary>
     public (int x, int y) SnapToGrid(int x, int y)
     {
@@ -63,8 +85,9 @@ public class GridService
             return (x, y);
         }
 
-        // Get the monitor this position is on
-        var display = GetDisplayAreaForPoint(x, y);
+        // Use the mouse cursor position to determine which monitor's grid to snap to
+        // This ensures alignment with the visible grid overlay
+        var display = GetDisplayAreaForCursor();
         int monitorOriginX = display.WorkArea.X;
         int monitorOriginY = display.WorkArea.Y;
 
