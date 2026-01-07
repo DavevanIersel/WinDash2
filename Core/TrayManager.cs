@@ -11,23 +11,18 @@ namespace WinDash2.Core;
 internal class TrayManager : IDisposable
 {
     public IRelayCommand OpenManagerCommand { get; }
-    public IRelayCommand OpenSettingsCommand { get; }
     public IRelayCommand QuitCommand { get; }
     private readonly TaskbarIcon _trayIcon;
     private readonly Func<ManagerWindow> _managerWindowFactory;
-    private readonly Func<SettingsWindow> _settingsWindowFactory;
     private ManagerWindow? _managerWindow;
-    private SettingsWindow? _settingsWindow;
     private readonly WidgetManager _widgetManager;
 
-    public TrayManager(Func<ManagerWindow> managerWindowFactory, Func<SettingsWindow> settingsWindowFactory, WidgetManager widgetManager)
+    public TrayManager(Func<ManagerWindow> managerWindowFactory, WidgetManager widgetManager)
     {
         _managerWindowFactory = managerWindowFactory;
-        _settingsWindowFactory = settingsWindowFactory;
         _widgetManager = widgetManager;
 
         OpenManagerCommand = new RelayCommand(OpenManagerWindow);
-        OpenSettingsCommand = new RelayCommand(OpenSettingsWindow);
         QuitCommand = new RelayCommand(QuitApplication);
 
         var menuFlyout = new MenuFlyout();
@@ -36,12 +31,6 @@ internal class TrayManager : IDisposable
         {
             Text = "Open Manager",
             Command = OpenManagerCommand
-        });
-
-        menuFlyout.Items.Add(new MenuFlyoutItem
-        {
-            Text = "Settings",
-            Command = OpenSettingsCommand
         });
 
         menuFlyout.Items.Add(new MenuFlyoutItem
@@ -82,29 +71,9 @@ internal class TrayManager : IDisposable
         _widgetManager.SetDraggable(false);
     }
 
-    private void OpenSettingsWindow()
-    {
-        if (_settingsWindow == null)
-        {
-            _settingsWindow = _settingsWindowFactory();
-            _settingsWindow.Closed += OnSettingsClosed;
-            _settingsWindow.Activate();
-        }
-        else
-        {
-            _settingsWindow.Activate();
-        }
-    }
-
-    private void OnSettingsClosed(object sender, WindowEventArgs args)
-    {
-        _settingsWindow = null;
-    }
-
     private void QuitApplication()
     {
         _managerWindow?.Close();
-        _settingsWindow?.Close();
         _widgetManager.CloseAllWidgets();
     }
 

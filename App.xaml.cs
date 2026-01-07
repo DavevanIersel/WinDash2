@@ -45,13 +45,12 @@ public partial class App : Application
                 services.AddSingleton<GridService>();
                 services.AddSingleton<WidgetManager>();
                 services.AddTransient<ManagerWindow>();
-                services.AddTransient<SettingsWindow>();
                 services.AddTransient<WidgetLibraryPage>();
                 services.AddTransient<WidgetEditPage>();
+                services.AddTransient<SettingsPage>();
                 services.AddSingleton(provider =>
                     new TrayManager(
                         () => provider.GetRequiredService<ManagerWindow>(),
-                        () => provider.GetRequiredService<SettingsWindow>(),
                         provider.GetRequiredService<WidgetManager>()));
             })
             .Build();

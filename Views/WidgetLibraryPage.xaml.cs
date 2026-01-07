@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -7,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using WinDash2.Core;
 using WinDash2.Models;
+using WinDash2.Services;
 
 namespace WinDash2.Views;
 
@@ -95,5 +97,12 @@ public sealed partial class WidgetLibraryPage : Page
 
             Frame.Navigate(typeof(WidgetEditPage), args);
         }
+    }
+
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        var settingsService = App.AppHost.Services.GetRequiredService<SettingsService>();
+        var gridService = App.AppHost.Services.GetRequiredService<GridService>();
+        Frame.Navigate(typeof(SettingsPage), (settingsService, gridService));
     }
 }

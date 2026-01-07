@@ -10,7 +10,10 @@
     xmlns:tableView="using:WinUI.TableView">
 
     <StackPanel Padding="20">
-        <TextBlock Text="Widget Library" FontSize="24" FontWeight="Bold" Margin="0,0,0,10"/>
+        <Grid Margin="0,0,0,10">
+            <TextBlock Text="Widget Library" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left"/>
+            <Button Content="Settings" Click="SettingsButton_Click" HorizontalAlignment="Right"/>
+        </Grid>
         <TextBox PlaceholderText="Search widgets..." Margin="0,0,0,10" TextChanged="SearchBox_TextChanged"/>
         <tableView:TableView
             ItemsSource="{x:Bind FilteredWidgets}"
