@@ -13,14 +13,12 @@ public class WidgetManager
     private readonly Dictionary<Guid, Widget> _widgetConfigs = [];
     private readonly Dictionary<Guid, WidgetWindow> _widgetWindows = [];
     private readonly WidgetFileSystemService _widgetFileSystemService;
-    private readonly SettingsService _settingsService;
     private readonly GridService _gridService;
     private Boolean _isDraggable = false;
 
-    public WidgetManager(WidgetFileSystemService widgetFileSystemService, GridService gridService, SettingsService settingsService)
+    public WidgetManager(WidgetFileSystemService widgetFileSystemService, GridService gridService)
     {
         _widgetFileSystemService = widgetFileSystemService;
-        _settingsService = settingsService;
         _gridService = gridService;
     }
 

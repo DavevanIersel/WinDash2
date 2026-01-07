@@ -10,6 +10,9 @@
    version="1.1"
    sodipodi:docname="logo.svg"
    inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   inkscape:export-filename="logo96x96.png"
+   inkscape:export-xdpi="40.959999"
+   inkscape:export-ydpi="40.959999"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -50,14 +53,15 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="1.8683333"
-     inkscape:cx="53.256024"
-     inkscape:cy="44.157005"
+     inkscape:cx="53.791259"
+     inkscape:cy="44.157003"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="4472"
      inkscape:window-y="182"
      inkscape:window-maximized="1"
-     inkscape:current-layer="SVGRepo_iconCarrier" />
+     inkscape:current-layer="SVGRepo_iconCarrier"
+     inkscape:export-bgcolor="#ffffff00" />
   <g
      id="SVGRepo_bgCarrier"
      stroke-width="0" />
