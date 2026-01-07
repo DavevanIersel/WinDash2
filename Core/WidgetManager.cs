@@ -1,10 +1,7 @@
-﻿using Microsoft.UI.Xaml;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using WinDash2.Models;
 using WinDash2.Services;
 using WinDash2.Views;
@@ -16,11 +13,15 @@ public class WidgetManager
     private readonly Dictionary<Guid, Widget> _widgetConfigs = [];
     private readonly Dictionary<Guid, WidgetWindow> _widgetWindows = [];
     private readonly WidgetFileSystemService _widgetFileSystemService;
+    private readonly SettingsService _settingsService;
+    private readonly GridService _gridService;
     private Boolean _isDraggable = false;
 
-    public WidgetManager(WidgetFileSystemService widgetFileSystemService)
+    public WidgetManager(WidgetFileSystemService widgetFileSystemService, GridService gridService, SettingsService settingsService)
     {
         _widgetFileSystemService = widgetFileSystemService;
+        _settingsService = settingsService;
+        _gridService = gridService;
     }
 
     public void Initialize()
@@ -33,7 +34,6 @@ public class WidgetManager
             _widgetConfigs[widget.IdOrThrow] = widget;
             CreateOrUpdateWidgetWindow(widget);
         }
-        //move_external_windows_experiment();
     }
 
     //private void move_external_windows_experiment()
@@ -83,7 +83,7 @@ public class WidgetManager
 
     private WidgetWindow CreateWidgetWindow(Widget widget)
     {
-        var widgetWindow = new WidgetWindow(this, widget);
+        var widgetWindow = new WidgetWindow(this, _gridService, widget);
 
         _widgetWindows[widget.IdOrThrow] = widgetWindow;
         return widgetWindow;
@@ -116,6 +116,8 @@ public class WidgetManager
 
     public void CloseAllWidgets()
     {
+        _gridService.DestroyOverlay();
+        
         foreach (var window in _widgetWindows.Values)
         {
             window.Close();

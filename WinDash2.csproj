@@ -64,6 +64,14 @@
     <PackageReference Include="WinUI.TableView" Version="1.2.2" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Views\GridOverlayWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Views\SettingsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Views\WidgetEditPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
