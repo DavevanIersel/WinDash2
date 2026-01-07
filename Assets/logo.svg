@@ -1,29 +1,110 @@
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-<svg width="225px" height="225px" viewBox="0 0 64.00 64.00" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" fill="#000000" stroke="#000000" stroke-width="0.00064" transform="matrix(-1, 0, 0, 1, 0, 0)rotate(90)">
 
-<g id="SVGRepo_bgCarrier" stroke-width="0"/>
-
-<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC" stroke-width="2.048"/>
-
-<g id="SVGRepo_iconCarrier">
-
-<defs>
-
-<style>.cls-1{fill:#FFBE00;}.cls-2{fill:#00B5FF;}</style>
-
-</defs>
-
-<title/>
-
-<path class="cls-1" d="M26.68,27.81h-15a2,2,0,0,1-2-2V7.37a2,2,0,0,1,2-2h15a2,2,0,0,1,2,2V17.2a2,2,0,0,1-4,0V9.37h-11V23.81h11v-.18a2,2,0,0,1,4,0v2.18A2,2,0,0,1,26.68,27.81Z"/>
-
-<path class="cls-2" d="M52.31,27.81H34.06a2,2,0,0,1-2-2V7.37a2,2,0,0,1,2-2H52.31a2,2,0,0,1,2,2V25.81A2,2,0,0,1,52.31,27.81Zm-16.25-4H50.31V9.37H36.06Z"/>
-
-<path class="cls-2" d="M33.59,58.63H11.69a2,2,0,0,1-2-2V33a2,2,0,0,1,2-2H15a2,2,0,1,1,0,4H13.69V54.63h17.9V35H21.15a2,2,0,0,1,0-4H33.59a2,2,0,0,1,2,2V56.63A2,2,0,0,1,33.59,58.63Z"/>
-
-<path class="cls-2" d="M52.31,58.63H40.4a2,2,0,0,1-2-2V33a2,2,0,0,1,2-2H52.31a2,2,0,0,1,2,2V47.91a2,2,0,0,1-4,0V35H42.4V54.63h7.93a2,2,0,0,1,4,.3v1.7A2,2,0,0,1,52.31,58.63Z"/>
-
-</g>
-
+<svg
+   width="225px"
+   height="225px"
+   viewBox="0 0 64.00 64.00"
+   data-name="Layer 1"
+   id="Layer_1"
+   version="1.1"
+   sodipodi:docname="logo.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient4"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop5" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4"
+       id="linearGradient5"
+       x1="45.550519"
+       y1="44.481425"
+       x2="60.154161"
+       y2="44.481425"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview4"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="1.8683333"
+     inkscape:cx="53.256024"
+     inkscape:cy="44.157005"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="4472"
+     inkscape:window-y="182"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="SVGRepo_iconCarrier" />
+  <g
+     id="SVGRepo_bgCarrier"
+     stroke-width="0" />
+  <g
+     id="SVGRepo_tracerCarrier"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     stroke="#CCCCCC"
+     stroke-width="2.048" />
+  <g
+     id="SVGRepo_iconCarrier"
+     transform="matrix(0,1,1,0,0.00857583,-0.008576)">
+    <defs
+       id="defs1">
+      <style
+         id="style1">.cls-1{fill:#FFBE00;}.cls-2{fill:#00B5FF;}</style>
+    </defs>
+    <title
+       id="title1" />
+    <path
+       class="cls-1"
+       d="m 26.68,27.81 h -15 a 2,2 0 0 1 -2,-2 V 7.37 a 2,2 0 0 1 2,-2 h 15 a 2,2 0 0 1 2,2 v 9.83 a 2,2 0 0 1 -4,0 V 9.37 h -11 v 14.44 h 11 v -0.18 a 2,2 0 0 1 4,0 v 2.18 a 2,2 0 0 1 -2,2 z"
+       id="path1" />
+    <path
+       class="cls-2"
+       d="M 52.31,27.81 H 34.06 a 2,2 0 0 1 -2,-2 V 7.37 a 2,2 0 0 1 2,-2 h 18.25 a 2,2 0 0 1 2,2 v 18.44 a 2,2 0 0 1 -2,2 z m -16.25,-4 H 50.31 V 9.37 H 36.06 Z"
+       id="path2" />
+    <path
+       class="cls-2"
+       d="m 33.59,58.63 h -21.9 a 2,2 0 0 1 -2,-2 V 33 a 2,2 0 0 1 2,-2 H 15 a 2,2 0 1 1 0,4 h -1.31 v 19.63 h 17.9 V 35 H 21.15 a 2,2 0 0 1 0,-4 h 12.44 a 2,2 0 0 1 2,2 v 23.63 a 2,2 0 0 1 -2,2 z"
+       id="path3" />
+    <path
+       class="cls-2"
+       d="M 52.31,58.63 H 40.4 a 2,2 0 0 1 -2,-2 V 33 a 2,2 0 0 1 2,-2 h 11.91 a 2,2 0 0 1 2,2 v 14.91 a 2,2 0 0 1 -4,0 V 35 H 42.4 v 19.63 h 7.93 a 2.0056171,2.0056171 0 0 1 4,0.3 v 1.7 a 2,2 0 0 1 -2.02,2 z"
+       id="path4" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:42.8547px;font-family:'Yu Gothic UI';-inkscape-font-specification:'Yu Gothic UI Bold';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#ffbe00;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
+       x="48.762386"
+       y="57.040085"
+       id="text4"
+       transform="matrix(0,1,1,0,0,0)"
+       inkscape:label="2"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:42.8547px;font-family:'Yu Gothic UI';-inkscape-font-specification:'Yu Gothic UI Bold';fill:#ffbe00;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
+         x="48.762386"
+         y="57.040085">2</tspan></text>
+  </g>
 </svg>
