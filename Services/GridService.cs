@@ -123,22 +123,16 @@ public class GridService
             return (x, y, width, height);
         }
 
-        Debug.WriteLine($"Snapping window bounds: x={x}, y={y}, width={width}, height={height}");
-
-        // Account for window border when snapping
         var (snappedX, snappedY) = SnapToGrid(x, y);
         var (snappedWidth, snappedHeight) = SnapSizeToGrid(width, height);
-        
-        Debug.WriteLine($"Snapped window bounds: x={snappedX}, y={snappedY}, width={snappedWidth}, height={snappedHeight}");
+
         // Adjust back to include the border
-        int finalX = snappedX;
-        int finalY = snappedY;
-        int finalWidth = snappedWidth + WindowBorderOffset;
-        int finalHeight = snappedHeight + WindowBorderOffset;
+        int adjustedWidth = snappedWidth + WindowBorderOffset;
+        int adjustedHeight = snappedHeight + WindowBorderOffset;
 
-        Debug.WriteLine($"Final window bounds with border: x={finalX}, y={finalY}, width={finalWidth}, height={finalHeight}");
+        Debug.WriteLine($"Final window bounds with border: x={snappedX}, y={snappedY}, width={adjustedWidth}, height={adjustedHeight}");
 
-        return (finalX, finalY, finalWidth, finalHeight);
+        return (snappedX, snappedY, adjustedWidth, adjustedHeight);
     }
     #endregion
 

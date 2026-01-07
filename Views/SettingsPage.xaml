@@ -81,7 +81,7 @@
                 <StackPanel Spacing="8" Margin="0,8,0,0">
                     <NumberBox 
                         x:Name="GridSizeNumberBox"
-                        Header="Cell Size (pixels)"
+                        Header="Grid Cell Size (pixels)"
                         SpinButtonPlacementMode="Inline"
                         Minimum="10"
                         Maximum="500"
