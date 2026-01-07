@@ -2,10 +2,13 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using WinDash2.Core;
 using WinDash2.Models;
+using WinDash2.Services;
+using WinDash2.Utils;
 using WinDash2.WidgetOptions;
 using WinDash2.WidgetOptions.FunctionKeyActions;
 using WinDash2.WidgetOptions.HideScrollbarOption;
@@ -22,8 +25,11 @@ public sealed partial class WidgetWindow : Window
 
     private readonly Widget _widget;
     private readonly WidgetManager _widgetManager;
+    private readonly GridService _gridService;
 
     private const int WM_EXITSIZEMOVE = 0x0232;
+    private const int WM_ENTERSIZEMOVE = 0x0231;
+    private const int WM_MOVING = 0x0216;
     private const int GWLP_WNDPROC = -4;
 
     private readonly IWidgetOption[] options =
@@ -36,12 +42,13 @@ public sealed partial class WidgetWindow : Window
         new HideScrollbarOption(),
     ];
 
-    public WidgetWindow(WidgetManager widgetManager, Widget widget)
+    public WidgetWindow(WidgetManager widgetManager, GridService gridService, Widget widget)
     {
         InitializeComponent();
 
         _widget = widget;
         _widgetManager = widgetManager;
+        _gridService = gridService;
 
         var hWnd = WindowNative.GetWindowHandle(this);
         var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
@@ -105,7 +112,15 @@ public sealed partial class WidgetWindow : Window
 
     private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
-        if (msg == WM_EXITSIZEMOVE)
+        if (msg == WM_ENTERSIZEMOVE)
+        {
+            OnMoveResizeStarted();
+        }
+        else if (msg == WM_MOVING)
+        {
+            OnMoving();
+        }
+        else if (msg == WM_EXITSIZEMOVE)
         {
             OnMoveResizeFinished();
         }
@@ -113,15 +128,35 @@ public sealed partial class WidgetWindow : Window
         return CallWindowProc(oldWndProcPtr, hwnd, msg, wParam, lParam);
     }
 
+    private void OnMoveResizeStarted()
+    {
+        _gridService.OnMoveResizeStarted();
+    }
+
+    private void OnMoving()
+    {
+        _gridService.UpdateOverlayPosition();
+    }
+
     private void OnMoveResizeFinished()
     {
+        _gridService.OnMoveResizeFinished();
+
         var rect = appWindow.Size;
         var pos = appWindow.Position;
 
-        _widget.X = pos.X;
-        _widget.Y = pos.Y;
-        _widget.Width = rect.Width;
-        _widget.Height = rect.Height;
+        var (finalX, finalY, finalWidth, finalHeight) = _gridService.SnapWindowBounds(
+            pos.X, pos.Y, rect.Width, rect.Height);
+
+        if (finalX != pos.X || finalY != pos.Y || finalWidth != rect.Width || finalHeight != rect.Height)
+        {
+            appWindow.MoveAndResize(new Windows.Graphics.RectInt32(finalX, finalY, finalWidth, finalHeight));
+        }
+
+        _widget.X = finalX;
+        _widget.Y = finalY;
+        _widget.Width = finalWidth;
+        _widget.Height = finalHeight;
 
         _widgetManager.SaveWidget(_widget, false);
     }

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using H.NotifyIcon;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -25,7 +25,6 @@ internal class TrayManager : IDisposable
         OpenManagerCommand = new RelayCommand(OpenManagerWindow);
         QuitCommand = new RelayCommand(QuitApplication);
 
-        // Create MenuFlyout in code and assign commands directly
         var menuFlyout = new MenuFlyout();
 
         menuFlyout.Items.Add(new MenuFlyoutItem

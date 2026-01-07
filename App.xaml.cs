@@ -22,6 +22,14 @@ public partial class App : Application
 #endif
        "widgets"
    );
+    
+    static readonly string SETTINGS_PATH = Path.Combine(
+       Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+       "WinDash2"
+#if DEBUG
+       , "dev"
+#endif
+   );
 
     public App()
     {
@@ -32,13 +40,18 @@ public partial class App : Application
             {
                 services.AddSingleton(provider =>
                     new WidgetFileSystemService(WIDGETS_PATH));
+                services.AddSingleton(provider =>
+                    new SettingsService(SETTINGS_PATH));
+                services.AddSingleton<GridService>();
                 services.AddSingleton<WidgetManager>();
                 services.AddTransient<ManagerWindow>();
                 services.AddTransient<WidgetLibraryPage>();
                 services.AddTransient<WidgetEditPage>();
+                services.AddTransient<SettingsPage>();
                 services.AddSingleton(provider =>
-                    new TrayManager(() => provider.GetRequiredService<ManagerWindow>(),
-                    provider.GetRequiredService<WidgetManager>()));
+                    new TrayManager(
+                        () => provider.GetRequiredService<ManagerWindow>(),
+                        provider.GetRequiredService<WidgetManager>()));
             })
             .Build();
     }
