@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -33,6 +34,8 @@ public sealed partial class WidgetLibraryPage : Page
 
         _widgetManager = (WidgetManager)e.Parameter;
 
+        // Clear and reload widgets to pick up any changes
+        _allWidgets.Clear();
         foreach (var widget in _widgetManager.GetWidgets())
         {
             _allWidgets.Add(widget);
@@ -97,6 +100,30 @@ public sealed partial class WidgetLibraryPage : Page
 
             Frame.Navigate(typeof(WidgetEditPage), args);
         }
+    }
+
+    private void CreateButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_widgetManager == null) return;
+
+        var newWidget = new Widget
+        {
+            Id = Guid.NewGuid(),
+            Name = "New Widget",
+            Url = "",
+            Width = 600,
+            Height = 400,
+            Enabled = false
+        };
+
+        var args = new WidgetEditArgs
+        {
+            Widget = newWidget,
+            WidgetManager = _widgetManager,
+            IsNewWidget = true
+        };
+
+        Frame.Navigate(typeof(WidgetEditPage), args);
     }
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)

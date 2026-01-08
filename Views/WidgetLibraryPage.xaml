@@ -12,7 +12,10 @@
     <StackPanel Padding="20">
         <Grid Margin="0,0,0,10">
             <TextBlock Text="Widget Library" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left"/>
-            <Button Content="Settings" Click="SettingsButton_Click" HorizontalAlignment="Right"/>
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                <Button Content="Create New Widget" Click="CreateButton_Click"/>
+                <Button Content="Settings" Click="SettingsButton_Click"/>
+            </StackPanel>
         </Grid>
         <TextBox PlaceholderText="Search widgets..." Margin="0,0,0,10" TextChanged="SearchBox_TextChanged"/>
         <tableView:TableView

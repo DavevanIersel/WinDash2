@@ -5,6 +5,7 @@ using Microsoft.Web.WebView2.Core;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using WinDash2.Core;
 using WinDash2.Models;
 using WinDash2.WidgetOptions;
@@ -19,11 +20,13 @@ public class WidgetEditArgs
 {
     public required Widget Widget { get; init; }
     public required WidgetManager WidgetManager { get; init; }
+    public bool IsNewWidget { get; init; } = false;
 }
 
 public sealed partial class WidgetEditPage : Page
 {
     private WidgetManager? _widgetManager;
+    private bool _isNewWidget;
     public Widget Widget { get; set; }
 
     private static readonly IWidgetOption[] Options =
@@ -69,7 +72,20 @@ public sealed partial class WidgetEditPage : Page
 
         PreviewWebView.Width = Widget.Width;
         PreviewWebView.Height = Widget.Height;
-        PreviewWebView.CoreWebView2.Navigate(Widget.Url);
+        
+        // Only navigate if URL is not empty and is a valid URI
+        if (!string.IsNullOrWhiteSpace(Widget.Url) && Uri.TryCreate(Widget.Url, UriKind.Absolute, out _))
+        {
+            PlaceholderPanel.Visibility = Visibility.Collapsed;
+            PreviewWebView.Visibility = Visibility.Visible;
+            PreviewWebView.CoreWebView2.Navigate(Widget.Url);
+        }
+        else
+        {
+            // Show native placeholder when URL is empty or invalid
+            PreviewWebView.Visibility = Visibility.Collapsed;
+            PlaceholderPanel.Visibility = Visibility.Visible;
+        }
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -80,6 +96,7 @@ public sealed partial class WidgetEditPage : Page
         {
             Widget = args.Widget;
             _widgetManager = args.WidgetManager;
+            _isNewWidget = args.IsNewWidget;
 
             Widget.PropertyChanged += Widget_PropertyChanged;
         }
@@ -88,6 +105,20 @@ public sealed partial class WidgetEditPage : Page
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         if (_widgetManager == null) return;
+
+        if (_isNewWidget)
+        {
+            // Generate a filename based on widget name
+            var safeName = string.Join("_", Widget.Name.Split(Path.GetInvalidFileNameChars()));
+            if (string.IsNullOrWhiteSpace(safeName))
+            {
+                safeName = "widget";
+            }
+            Widget.FileName = $"{safeName.ToLower()}.widget.json";
+            
+            // Ensure the widget has an ID
+            Widget.Id ??= Guid.NewGuid();
+        }
 
         _widgetManager.SaveWidget(Widget, true);
         Frame.GoBack();

@@ -98,7 +98,10 @@ public class WidgetManager
 
     public void SaveWidget(Widget widget, bool rerender)
     {
-        _widgetConfigs[widget.IdOrThrow] = widget;
+        var widgetId = widget.IdOrThrow;
+        var isNewWidget = !_widgetConfigs.ContainsKey(widgetId);
+        
+        _widgetConfigs[widgetId] = widget;
 
         if (rerender)
         {
