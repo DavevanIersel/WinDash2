@@ -58,7 +58,7 @@ public class WidgetManager
         {
             bool enabled = widget.Enabled;
 
-            existingWindow.Close();
+            existingWindow.CloseForRerender();
             _widgetWindows.Remove(widget.IdOrThrow);
 
             if (!enabled) return;

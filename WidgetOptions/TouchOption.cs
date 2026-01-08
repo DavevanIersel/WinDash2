@@ -12,24 +12,25 @@ public class TouchOption : IWidgetOption
 {
     public void Apply(Widget widget, WebView2 webView, Window? window)
     {
-        if (widget.TouchEnabled == true)
-        {
-            _ = EnableTouchAsync(webView.CoreWebView2);
-        }
+        _ = SetTouchEmulationAsync(webView.CoreWebView2, widget.TouchEnabled ?? false);
     }
 
-    private static async Task EnableTouchAsync(CoreWebView2 coreWebView2)
+    private static async Task SetTouchEmulationAsync(CoreWebView2 coreWebView2, bool enabled)
     {
         try
         {
+            var emitTouchValue = enabled
+                ? @"{ ""enabled"": true, ""configuration"": ""mobile"" }"
+                : @"{ ""enabled"": false }";
+            
             await coreWebView2.CallDevToolsProtocolMethodAsync(
                 "Emulation.setEmitTouchEventsForMouse",
-                @"{ ""enabled"": true, ""configuration"": ""mobile"" }"
+                emitTouchValue
             );
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Failed to enable touch emulation: {ex}");
+            Debug.WriteLine($"Failed to set touch emulation: {ex}");
         }
     }
 }

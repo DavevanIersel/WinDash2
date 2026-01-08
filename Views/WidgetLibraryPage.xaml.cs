@@ -18,9 +18,6 @@ public sealed partial class WidgetLibraryPage : Page
     private WidgetManager? _widgetManager;
     private readonly ObservableCollection<Widget> _allWidgets = [];
     public ObservableCollection<Widget> FilteredWidgets { get; } = [];
-    private bool _isInitialized;
-
-    private readonly HashSet<Widget> _suppressToggles = [];
 
     public WidgetLibraryPage()
     {
@@ -29,7 +26,6 @@ public sealed partial class WidgetLibraryPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        _isInitialized = false;
         base.OnNavigatedTo(e);
 
         _widgetManager = (WidgetManager)e.Parameter;
@@ -42,7 +38,6 @@ public sealed partial class WidgetLibraryPage : Page
         }
 
         ApplyFilter("");
-        DispatcherQueue.TryEnqueue(() => _isInitialized = true);
     }
 
     private void ApplyFilter(string query)
@@ -63,9 +58,8 @@ public sealed partial class WidgetLibraryPage : Page
 
     private void ToggleSwitch_Loading(FrameworkElement sender, object args)
     {
-        if (sender is ToggleSwitch toggleSwitch && toggleSwitch.DataContext is Widget widget && widget.Enabled)
+        if (sender is ToggleSwitch toggleSwitch && toggleSwitch.DataContext is Widget widget)
         {
-            _suppressToggles.Add(widget);
             toggleSwitch.IsOn = widget.Enabled;
         }
     }
@@ -73,11 +67,19 @@ public sealed partial class WidgetLibraryPage : Page
 
     private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
     {
-        if (!_isInitialized || _widgetManager == null) return;
-
         if (sender is ToggleSwitch toggleSwitch && toggleSwitch.DataContext is Widget widget)
         {
-            if (_suppressToggles.Remove(widget)) return;
+            if (_widgetManager == null)
+            {
+                return;
+            }
+
+            // Only save if the toggle state actually differs from the widget state
+            // This prevents saving when we're just syncing UI to match the widget
+            if (widget.Enabled == toggleSwitch.IsOn)
+            {
+                return;
+            }
 
             toggleSwitch.IsEnabled = false;
             widget.Enabled = toggleSwitch.IsOn;
@@ -113,7 +115,8 @@ public sealed partial class WidgetLibraryPage : Page
             Url = "",
             Width = 600,
             Height = 400,
-            Enabled = false
+            Enabled = false,
+            TouchEnabled = false
         };
 
         var args = new WidgetEditArgs

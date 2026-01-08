@@ -26,6 +26,7 @@ public sealed partial class WidgetWindow : Window
     private readonly Widget _widget;
     private readonly WidgetManager _widgetManager;
     private readonly GridService _gridService;
+    private bool _isRerendering = false;
 
     private const int WM_EXITSIZEMOVE = 0x0232;
     private const int WM_ENTERSIZEMOVE = 0x0231;
@@ -106,8 +107,18 @@ public sealed partial class WidgetWindow : Window
 
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
-        _widget.Enabled = false;
-        _widgetManager.SaveWidget(_widget, false);
+        // Only disable widget if this is a user-initiated close, not a rerender
+        if (!_isRerendering)
+        {
+            _widget.Enabled = false;
+            _widgetManager.SaveWidget(_widget, false);
+        }
+    }
+
+    public void CloseForRerender()
+    {
+        _isRerendering = true;
+        this.Close();
     }
 
     private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)

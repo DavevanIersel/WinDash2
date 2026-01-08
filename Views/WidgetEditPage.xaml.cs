@@ -39,7 +39,6 @@ public sealed partial class WidgetEditPage : Page
         new HideScrollbarOption(),
         new MouseNavigationOption(),
     ];
-    private TypedEventHandler<CoreWebView2, CoreWebView2NavigationCompletedEventArgs>? _navigationCompletedHandler;
 
     public WidgetEditPage()
     {
@@ -55,20 +54,17 @@ public sealed partial class WidgetEditPage : Page
 
     private void UpdatePreview()
     {
-        if (_navigationCompletedHandler != null)
+        // Check if CoreWebView2 is initialized
+        if (PreviewWebView.CoreWebView2 == null)
         {
-            PreviewWebView.CoreWebView2.NavigationCompleted -= _navigationCompletedHandler;
+            return;
         }
 
-        _navigationCompletedHandler = (s, e) =>
+        // Apply options before navigation
+        foreach (var option in Options)
         {
-            foreach (var option in Options)
-            {
-                option.Apply(Widget, PreviewWebView, null);
-            }
-        };
-
-        PreviewWebView.CoreWebView2.NavigationCompleted += _navigationCompletedHandler;
+            option.Apply(Widget, PreviewWebView, null);
+        }
 
         PreviewWebView.Width = Widget.Width;
         PreviewWebView.Height = Widget.Height;
@@ -99,6 +95,7 @@ public sealed partial class WidgetEditPage : Page
             _isNewWidget = args.IsNewWidget;
 
             Widget.PropertyChanged += Widget_PropertyChanged;
+            TouchEnabledSwitch.IsOn = Widget.TouchEnabled.GetValueOrDefault();
         }
     }
 
@@ -127,6 +124,44 @@ public sealed partial class WidgetEditPage : Page
     private void Widget_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         Debug.WriteLine("Changed");
+        UpdatePreview();
+    }
+
+    private void TouchEnabledSwitch_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (sender is ToggleSwitch toggleSwitch)
+        {
+            Widget.TouchEnabled = toggleSwitch.IsOn;
+            UpdatePreview();
+        }
+    }
+
+    private void AddUserAgent_Click(object sender, RoutedEventArgs e)
+    {
+        Widget.CustomUserAgent ??= [];
+        Widget.CustomUserAgent.Add(new UserAgentMapping
+        {
+            Domain = "",
+            UserAgent = ""
+        });
+
+        UpdateUserAgentsinEditor();
+    }
+
+    private void RemoveUserAgent_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is UserAgentMapping mapping)
+        {
+            Widget.CustomUserAgent?.Remove(mapping);
+            
+            UpdateUserAgentsinEditor();
+        }
+    }
+
+    private void UpdateUserAgentsinEditor()
+    {
+        UserAgentsList.ItemsSource = null;
+        UserAgentsList.ItemsSource = Widget.CustomUserAgent;
         UpdatePreview();
     }
 
