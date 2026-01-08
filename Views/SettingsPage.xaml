@@ -8,91 +8,116 @@
     mc:Ignorable="d">
 
     <ScrollViewer>
-        <StackPanel Padding="20" Spacing="24">
-            <StackPanel Spacing="8">
-                <Grid>
-                    <Button Content="← Back" Click="BackButton_Click" HorizontalAlignment="Left"/>
+        <StackPanel Padding="20" Spacing="20">
+            <!-- Header Section -->
+            <Grid Margin="0,0,0,20">
+                <Button Click="BackButton_Click" 
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="0"
+                        Height="32">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE72B;" FontSize="14"/>
+                        <TextBlock Text="Back" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <StackPanel HorizontalAlignment="Left" Margin="0,48,0,0">
                     <TextBlock 
                         Text="Settings" 
                         FontSize="24" 
-                        FontWeight="Bold"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"/>
-                </Grid>
-                
-                <TextBlock 
-                    Text="Configure your widget experience"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-            </StackPanel>
+                        FontWeight="Bold"/>
+                    <TextBlock 
+                        Text="Configure your widget experience"
+                        FontSize="13"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Margin="0,4,0,0"/>
+                </StackPanel>
+            </Grid>
 
-            <StackPanel Spacing="8">
+            <!-- Widget Dragging Section -->
+            <StackPanel Spacing="12">
                 <TextBlock 
                     Text="Widget Dragging" 
-                    FontSize="18" 
-                    FontWeight="SemiBold"/>
+                    FontSize="14" 
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                 
-                <StackPanel Spacing="16" Margin="0,8,0,0">
-                    <RadioButton 
-                        x:Name="FreeDragRadioButton"
-                        Content="Free Drag"
-                        GroupName="DragMode"
-                        Checked="OnDragModeChanged">
-                        <RadioButton.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel>
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16">
+                    <StackPanel Spacing="12">
+                        <RadioButton 
+                            x:Name="FreeDragRadioButton"
+                            GroupName="DragMode"
+                            Checked="OnDragModeChanged">
+                            <RadioButton.Content>
+                                <StackPanel Margin="8,0,0,0">
                                     <TextBlock Text="Free Drag" FontWeight="SemiBold"/>
                                     <TextBlock 
                                         Text="Move widgets freely without any snapping"
                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                         TextWrapping="Wrap"
-                                        Margin="0,4,0,0"/>
+                                        FontSize="13"
+                                        Margin="0,2,0,0"/>
                                 </StackPanel>
-                            </DataTemplate>
-                        </RadioButton.ContentTemplate>
-                    </RadioButton>
+                            </RadioButton.Content>
+                        </RadioButton>
 
-                    <RadioButton 
-                        x:Name="GridBasedRadioButton"
-                        Content="Grid-Based"
-                        GroupName="DragMode"
-                        Checked="OnDragModeChanged">
-                        <RadioButton.ContentTemplate>
-                            <DataTemplate>
-                                <StackPanel>
+                        <RadioButton 
+                            x:Name="GridBasedRadioButton"
+                            GroupName="DragMode"
+                            Checked="OnDragModeChanged">
+                            <RadioButton.Content>
+                                <StackPanel Margin="8,0,0,0">
                                     <TextBlock Text="Grid-Based" FontWeight="SemiBold"/>
                                     <TextBlock 
                                         Text="Snap widgets to a grid for precise alignment"
                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                         TextWrapping="Wrap"
-                                        Margin="0,4,0,0"/>
+                                        FontSize="13"
+                                        Margin="0,2,0,0"/>
                                 </StackPanel>
-                            </DataTemplate>
-                        </RadioButton.ContentTemplate>
-                    </RadioButton>
-                </StackPanel>
+                            </RadioButton.Content>
+                        </RadioButton>
+                    </StackPanel>
+                </Border>
             </StackPanel>
 
-            <StackPanel Spacing="8">
+            <!-- Grid Size Section -->
+            <StackPanel Spacing="12">
                 <TextBlock 
-                    Text="Grid Size" 
-                    FontSize="18" 
-                    FontWeight="SemiBold"/>
+                    Text="Grid Configuration" 
+                    FontSize="14" 
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                 
-                <StackPanel Spacing="8" Margin="0,8,0,0">
-                    <NumberBox 
-                        x:Name="GridSizeNumberBox"
-                        Header="Grid Cell Size (pixels)"
-                        SpinButtonPlacementMode="Inline"
-                        Minimum="10"
-                        Maximum="500"
-                        SmallChange="10"
-                        LargeChange="50"
-                        ValueChanged="OnGridSizeChanged"/>
-                    <TextBlock 
-                        Text="Size of each grid cell for snapping widgets"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        TextWrapping="Wrap"/>
-                </StackPanel>
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16">
+                    <StackPanel Spacing="8">
+                        <NumberBox 
+                            x:Name="GridSizeNumberBox"
+                            Header="Grid Cell Size (pixels)"
+                            SpinButtonPlacementMode="Inline"
+                            Minimum="10"
+                            Maximum="500"
+                            SmallChange="10"
+                            LargeChange="50"
+                            ValueChanged="OnGridSizeChanged"
+                            HorizontalAlignment="Stretch"/>
+                        <TextBlock 
+                            Text="Size of each grid cell for snapping widgets"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            TextWrapping="Wrap"
+                            FontSize="13"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

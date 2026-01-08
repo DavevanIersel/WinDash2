@@ -12,14 +12,14 @@
 
     <Grid Padding="20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="Auto" MinWidth="200"/>
+            <ColumnDefinition Width="Auto" />
             <!-- GridSplitter width -->
-            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="*" MinWidth="400"/>
         </Grid.ColumnDefinitions>
 
         <!-- Preview WebView on the left -->
-        <Grid Grid.Column="0" Margin="8">
+        <Grid Grid.Column="0" Margin="0,0,20,0">
             <WebView2 x:Name="PreviewWebView"/>
             
             <!-- Native placeholder shown when no URL is set -->
@@ -28,10 +28,12 @@
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     BorderThickness="1"
                     CornerRadius="8"
-                    Visibility="Collapsed">
+                    Visibility="Collapsed"
+                    Padding="60">
                 <StackPanel VerticalAlignment="Center" 
                            HorizontalAlignment="Center"
-                           Spacing="12">
+                           Spacing="12"
+                           MaxWidth="400">
                     <FontIcon Glyph="&#xE8A7;" 
                              FontSize="48" 
                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
@@ -43,34 +45,83 @@
                     <TextBlock Text="Enter a valid URL to preview the widget" 
                               FontSize="14" 
                               Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                              HorizontalAlignment="Center"/>
+                              HorizontalAlignment="Center"
+                              TextWrapping="Wrap"
+                              TextAlignment="Center"/>
                 </StackPanel>
             </Border>
         </Grid>
 
         <!-- Resizable splitter -->
         <controls:GridSplitter Grid.Column="1"
-                               Width="5"
-                               Background="Gray"
+                               Width="1"
+                               Background="{ThemeResource DividerStrokeColorDefaultBrush}"
                                ResizeBehavior="PreviousAndNext"
                                ResizeDirection="Columns" />
 
         <!-- Form on the right -->
-        <ScrollViewer Grid.Column="2">
-            <StackPanel Spacing="12">
-                <TextBlock Text="Edit Widget" FontSize="24" FontWeight="Bold"/>
+        <ScrollViewer Grid.Column="2" Padding="20,0,0,0">
+            <StackPanel Spacing="16">
+                <!-- Header with Back Button -->
+                <Grid Margin="0,0,0,20">
+                    <Button Click="Cancel_Click" 
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Height="32">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE72B;" FontSize="14"/>
+                            <TextBlock Text="Back" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Text="Edit Widget" 
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               HorizontalAlignment="Left"
+                               Margin="0,48,0,0"/>
+                </Grid>
 
-                <TextBox Header="Name" Text="{x:Bind Widget.Name, Mode=TwoWay}" />
-                <TextBox x:Name="UrlTextBox" Header="URL" Text="{x:Bind Widget.Url, Mode=TwoWay}" TextChanged="OnUrlOrHtmlChanged" />
-                <TextBox x:Name="HtmlTextBox" Header="HTML" Text="{x:Bind Widget.Html, Mode=TwoWay}" TextChanged="OnUrlOrHtmlChanged" />
-                <TextBox Header="Width" Text="{x:Bind Widget.Width, Mode=TwoWay}" />
-                <TextBox Header="Height" Text="{x:Bind Widget.Height, Mode=TwoWay}" />
+                <!-- Basic Info Section -->
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Basic Information" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                    <TextBox Header="Name" Text="{x:Bind Widget.Name, Mode=TwoWay}" />
+                </StackPanel>
 
-                <ToggleSwitch x:Name="TouchEnabledSwitch" Header="Touch Enabled" Toggled="TouchEnabledSwitch_Toggled" />
+                <!-- Source Section -->
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Source" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                    <TextBox x:Name="UrlTextBox" Header="URL" Text="{x:Bind Widget.Url, Mode=TwoWay}" TextChanged="OnUrlOrHtmlChanged" />
+                    <TextBox x:Name="HtmlTextBox" Header="HTML" Text="{x:Bind Widget.Html, Mode=TwoWay}" TextChanged="OnUrlOrHtmlChanged" />
+                </StackPanel>
+
+                <!-- Sizing Section -->
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Sizing" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Header="Width" Text="{x:Bind Widget.Width, Mode=TwoWay}" />
+                        <TextBox Grid.Column="1" Header="Height" Text="{x:Bind Widget.Height, Mode=TwoWay}" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- Touch Section -->
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Input Settings" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                    <ToggleSwitch x:Name="TouchEnabledSwitch" Header="Touch Enabled" Toggled="TouchEnabledSwitch_Toggled" OnContent="" OffContent=""/>
+                </StackPanel>
 
                 <!-- Custom User Agents Section -->
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Custom User Agents" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock Text="Custom User Agents" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                    <TextBlock Text="Override user agent strings for specific domains to control how websites identify the browser." 
+                               FontSize="12" 
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
+                               TextWrapping="Wrap"/>
                     
                     <ItemsControl x:Name="UserAgentsList" ItemsSource="{x:Bind Widget.CustomUserAgent, Mode=OneWay}">
                         <ItemsControl.ItemTemplate>
@@ -91,32 +142,35 @@
                                              PlaceholderText="User Agent String"
                                              Text="{x:Bind UserAgent, Mode=TwoWay}"/>
                                     <Button Grid.Column="4" 
-                                            Content="-" 
-                                            Background="#E74856"
-                                            Foreground="White"
+                                            ToolTipService.ToolTip="Remove"
                                             Click="RemoveUserAgent_Click"
                                             Tag="{x:Bind}"
-                                            Width="40"
-                                            Height="32"/>
+                                            Width="32"
+                                            Height="32"
+                                            Padding="4">
+                                        <FontIcon Glyph="&#xE74D;" FontSize="16" Foreground="#E74856"/>
+                                    </Button>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     
-                    <Button Content="+" 
-                            Background="#0078D4"
-                            Foreground="White"
-                            Click="AddUserAgent_Click"
+                    <Button Click="AddUserAgent_Click"
                             HorizontalAlignment="Stretch"
-                            Height="32"/>
+                            Height="32">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE710;" FontSize="14"/>
+                            <TextBlock Text="Add User Agent"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
 
                 <!-- Force In Current Tab Section -->
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Force In Current Tab" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock Text="Force In Current Tab" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                     <TextBlock Text="URL patterns to open in current tab instead of new windows. Use * as wildcard." 
                                FontSize="12" 
-                               Foreground="Gray" 
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
                                TextWrapping="Wrap"/>
                     
                     <ItemsControl x:Name="ForceInCurrentTabList" ItemsSource="{x:Bind ForceInCurrentTabPatterns, Mode=OneWay}">
@@ -133,30 +187,43 @@
                                              PlaceholderText="URL Pattern (e.g., /webplayer or */foo* or *)" 
                                              Text="{x:Bind Pattern, Mode=TwoWay}"/>
                                     <Button Grid.Column="2" 
-                                            Content="-" 
-                                            Background="#E74856"
-                                            Foreground="White"
+                                            ToolTipService.ToolTip="Remove"
                                             Click="RemoveForceInCurrentTab_Click"
                                             Tag="{x:Bind}"
-                                            Width="40"
-                                            Height="32"/>
+                                            Width="32"
+                                            Height="32"
+                                            Padding="4">
+                                        <FontIcon Glyph="&#xE74D;" FontSize="16" Foreground="#E74856"/>
+                                    </Button>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     
-                    <Button Content="+" 
-                            Background="#0078D4"
-                            Foreground="White"
-                            Click="AddForceInCurrentTab_Click"
+                    <Button Click="AddForceInCurrentTab_Click"
                             HorizontalAlignment="Stretch"
-                            Height="32"/>
+                            Height="32">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE710;" FontSize="14"/>
+                            <TextBlock Text="Add Pattern"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
 
-                <!-- Buttons -->
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button Content="Save" Click="Save_Click"/>
-                    <Button Content="Cancel" Click="Cancel_Click"/>
+                <!-- Action Buttons -->
+                <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                    <Button Click="Save_Click" Style="{StaticResource AccentButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE74E;" FontSize="14"/>
+                            <TextBlock Text="Save"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Click="Cancel_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE711;" FontSize="14"/>
+                            <TextBlock Text="Cancel"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
