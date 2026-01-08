@@ -80,7 +80,22 @@ public sealed partial class WidgetWindow : Window
 
         this.Closed += OnWindowClosed;
 
-        WidgetWebView.CoreWebView2.Navigate(_widget.Url);
+        try
+        {
+            await CustomWidgetLoader.LoadAsync(_widget, WidgetWebView);
+        }
+        catch (Exception ex)
+        {
+            ShowError("Error Loading Widget", ex.Message);
+        }
+    }
+
+    private void ShowError(string title, string message)
+    {
+        WidgetWebView.Visibility = Visibility.Collapsed;
+        ErrorPanel.Visibility = Visibility.Visible;
+        ErrorTitle.Text = title;
+        ErrorMessage.Text = message;
     }
 
     private void SetupTitleBar()

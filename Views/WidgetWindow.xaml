@@ -10,6 +10,31 @@
     <Grid>
         <controls:WebView2 x:Name="WidgetWebView" />
         
+        <!-- Error panel -->
+        <Border x:Name="ErrorPanel"
+                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                Visibility="Collapsed">
+            <StackPanel VerticalAlignment="Center" 
+                       HorizontalAlignment="Center"
+                       Spacing="12"
+                       Padding="20">
+                <FontIcon Glyph="&#xE783;" 
+                         FontSize="48" 
+                         Foreground="{ThemeResource SystemErrorTextColor}"/>
+                <TextBlock x:Name="ErrorTitle"
+                          Text="Error Loading Widget" 
+                          FontSize="20" 
+                          FontWeight="SemiBold"
+                          HorizontalAlignment="Center"/>
+                <TextBlock x:Name="ErrorMessage"
+                          Text="" 
+                          FontSize="14" 
+                          TextWrapping="Wrap"
+                          MaxWidth="400"
+                          HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+        
         <!-- Semi-transparent drag bar overlay -->
         <Border x:Name="DragBar" 
                 VerticalAlignment="Top" 

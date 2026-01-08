@@ -8,8 +8,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using WinDash2.Core;
 using WinDash2.Models;
+using WinDash2.Utils;
 using WinDash2.WidgetOptions;
 using WinDash2.WidgetOptions.FunctionKeyActions;
 using WinDash2.WidgetOptions.HideScrollbarOption;
@@ -51,10 +53,11 @@ public sealed partial class WidgetEditPage : Page
     private async void OnPageLoad(object sender, RoutedEventArgs e)
     {
         await PreviewWebView.EnsureCoreWebView2Async();
-        UpdatePreview();
+        UpdateUrlHtmlFieldStates();
+        await UpdatePreview();
     }
 
-    private void UpdatePreview()
+    private async Task UpdatePreview()
     {
         // Check if CoreWebView2 is initialized
         if (PreviewWebView.CoreWebView2 == null)
@@ -71,12 +74,32 @@ public sealed partial class WidgetEditPage : Page
         PreviewWebView.Width = Widget.Width;
         PreviewWebView.Height = Widget.Height;
         
-        // Only navigate if URL is not empty and is a valid URI
-        if (!string.IsNullOrWhiteSpace(Widget.Url) && Uri.TryCreate(Widget.Url, UriKind.Absolute, out _))
+        // Check if we have content to display
+        if (!string.IsNullOrWhiteSpace(Widget.Html) || !string.IsNullOrWhiteSpace(Widget.Url))
         {
             PlaceholderPanel.Visibility = Visibility.Collapsed;
             PreviewWebView.Visibility = Visibility.Visible;
-            PreviewWebView.CoreWebView2.Navigate(Widget.Url);
+            
+            try
+            {
+                await CustomWidgetLoader.LoadAsync(Widget, PreviewWebView);
+            }
+            catch (Exception ex)
+            {
+                // Show error in placeholder
+                PreviewWebView.Visibility = Visibility.Collapsed;
+                PlaceholderPanel.Visibility = Visibility.Visible;
+                
+                // Update placeholder to show error (reusing existing elements)
+                var stackPanel = PlaceholderPanel.Child as StackPanel;
+                if (stackPanel != null && stackPanel.Children.Count >= 2)
+                {
+                    if (stackPanel.Children[1] is TextBlock titleBlock)
+                        titleBlock.Text = "Error Loading Widget";
+                    if (stackPanel.Children.Count >= 3 && stackPanel.Children[2] is TextBlock msgBlock)
+                        msgBlock.Text = ex.Message;
+                }
+            }
         }
         else
         {
@@ -108,6 +131,9 @@ public sealed partial class WidgetEditPage : Page
                     ForceInCurrentTabPatterns.Add(new ForceInCurrentTabPattern { Pattern = pattern });
                 }
             }
+
+            // Set initial enabled state for URL/HTML fields
+            UpdateUrlHtmlFieldStates();
         }
     }
 
@@ -156,6 +182,21 @@ public sealed partial class WidgetEditPage : Page
             Widget.TouchEnabled = toggleSwitch.IsOn;
             UpdatePreview();
         }
+    }
+
+    private void OnUrlOrHtmlChanged(object sender, TextChangedEventArgs e)
+    {
+        UpdateUrlHtmlFieldStates();
+    }
+
+    private void UpdateUrlHtmlFieldStates()
+    {
+        // Disable HTML field if URL has content, and vice versa
+        var hasUrl = !string.IsNullOrWhiteSpace(UrlTextBox.Text);
+        var hasHtml = !string.IsNullOrWhiteSpace(HtmlTextBox.Text);
+
+        UrlTextBox.IsEnabled = !hasHtml;
+        HtmlTextBox.IsEnabled = !hasUrl;
     }
 
     private void AddUserAgent_Click(object sender, RoutedEventArgs e)

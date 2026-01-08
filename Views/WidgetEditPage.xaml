@@ -61,8 +61,8 @@
                 <TextBlock Text="Edit Widget" FontSize="24" FontWeight="Bold"/>
 
                 <TextBox Header="Name" Text="{x:Bind Widget.Name, Mode=TwoWay}" />
-                <TextBox Header="URL" Text="{x:Bind Widget.Url, Mode=TwoWay}" />
-                <TextBox Header="HTML" Text="{x:Bind Widget.Html, Mode=TwoWay}" />
+                <TextBox x:Name="UrlTextBox" Header="URL" Text="{x:Bind Widget.Url, Mode=TwoWay}" TextChanged="OnUrlOrHtmlChanged" />
+                <TextBox x:Name="HtmlTextBox" Header="HTML" Text="{x:Bind Widget.Html, Mode=TwoWay}" TextChanged="OnUrlOrHtmlChanged" />
                 <TextBox Header="Width" Text="{x:Bind Widget.Width, Mode=TwoWay}" />
                 <TextBox Header="Height" Text="{x:Bind Widget.Height, Mode=TwoWay}" />
 
