@@ -34,9 +34,7 @@ public class WidgetFileSystemService
             Directory.CreateDirectory(_widgetsFolderPath);
         }
 
-        var widgetFiles = Directory.GetFiles(_widgetsFolderPath, "*.widget.json");
-        Console.WriteLine($"Found {widgetFiles.Length} widget files");
-
+        var widgetFiles = Directory.GetFiles(_widgetsFolderPath, "*.widget.json", SearchOption.AllDirectories);
         var widgets = new List<Widget>();
 
         foreach (var file in widgetFiles)

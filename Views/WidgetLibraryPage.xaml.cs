@@ -44,7 +44,9 @@ public sealed partial class WidgetLibraryPage : Page
     {
         var lower = query.ToLowerInvariant();
         FilteredWidgets.Clear();
-        foreach (var widget in _allWidgets.Where(w => w.Name.ToLowerInvariant().Contains(lower)))
+        foreach (var widget in _allWidgets
+            .Where(w => w.Name.ToLowerInvariant().Contains(lower))
+            .OrderBy(w => w.Name, StringComparer.OrdinalIgnoreCase))
         {
             FilteredWidgets.Add(widget);
         }
