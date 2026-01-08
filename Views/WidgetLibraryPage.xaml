@@ -31,7 +31,7 @@
                 <tableView:TableViewTemplateColumn Header="Enabled" Width="Auto">
                     <tableView:TableViewTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="models:Widget">
-                            <ToggleSwitch Loading="ToggleSwitch_Loading" Toggled="ToggleSwitch_Toggled"/>
+                            <ToggleSwitch IsOn="{x:Bind Enabled, Mode=TwoWay}" Toggled="ToggleSwitch_Toggled"/>
 
                         </DataTemplate>
                     </tableView:TableViewTemplateColumn.CellTemplate>

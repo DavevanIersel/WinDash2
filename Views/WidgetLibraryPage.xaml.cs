@@ -58,15 +58,6 @@ public sealed partial class WidgetLibraryPage : Page
         ApplyFilter(query);
     }
 
-    private void ToggleSwitch_Loading(FrameworkElement sender, object args)
-    {
-        if (sender is ToggleSwitch toggleSwitch && toggleSwitch.DataContext is Widget widget)
-        {
-            toggleSwitch.IsOn = widget.Enabled;
-        }
-    }
-
-
     private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
     {
         if (sender is ToggleSwitch toggleSwitch && toggleSwitch.DataContext is Widget widget)
