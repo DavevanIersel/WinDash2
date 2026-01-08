@@ -51,7 +51,7 @@ public class WidgetFileSystemService
                 if (widget != null)
                 {
                     widget.Id ??= Guid.NewGuid();
-                    widget.FileName = Path.GetFileName(file);
+                    widget.FileName = Path.GetRelativePath(_widgetsFolderPath, file);
                     widgets.Add(widget);
                     Debug.WriteLine($"Loaded widget: {widget.Name} ({widget.Id})");
                 }

@@ -131,6 +131,33 @@ public sealed partial class WidgetLibraryPage : Page
         Frame.Navigate(typeof(WidgetEditPage), args);
     }
 
+    private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_widgetManager == null) return;
+
+        if (sender is Button button && button.DataContext is Widget widget)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Delete Widget",
+                Content = $"Are you sure you want to permanently delete '{widget.Name}'? This cannot be undone.",
+                PrimaryButtonText = "Delete",
+                CloseButtonText = "Cancel",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                _widgetManager.DeleteWidget(widget);
+                _allWidgets.Remove(widget);
+                FilteredWidgets.Remove(widget);
+            }
+        }
+    }
+
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
         var settingsService = App.AppHost.Services.GetRequiredService<SettingsService>();

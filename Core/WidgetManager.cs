@@ -115,6 +115,24 @@ public class WidgetManager
 
     public IReadOnlyCollection<Widget> GetWidgets() => _widgetConfigs.Values.ToList().AsReadOnly();
 
+    public void DeleteWidget(Widget widget)
+    {
+        var widgetId = widget.IdOrThrow;
+        
+        // Remove from configs first
+        _widgetConfigs.Remove(widgetId);
+        
+        // Close the widget window if it's open (use CloseForRerender to skip OnWindowClosed handler)
+        if (_widgetWindows.TryGetValue(widgetId, out var window))
+        {
+            _widgetWindows.Remove(widgetId);
+            window.CloseForRerender();
+        }
+        
+        // Delete the file
+        _widgetFileSystemService.DeleteWidget(widget);
+    }
+
     public void CloseAllWidgets()
     {
         _gridService.DestroyOverlay();

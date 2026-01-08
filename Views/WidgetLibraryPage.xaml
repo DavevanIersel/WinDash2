@@ -39,7 +39,13 @@
                 <tableView:TableViewTemplateColumn Header="Actions" Width="Auto">
                     <tableView:TableViewTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="models:Widget">
-                            <Button Content="Edit" Click="EditButton_Click"/>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <Button Content="Edit" Click="EditButton_Click"/>
+                                <Button Content="Delete" 
+                                        Click="DeleteButton_Click"
+                                        Background="#E74856"
+                                        Foreground="White"/>
+                            </StackPanel>
                         </DataTemplate>
                     </tableView:TableViewTemplateColumn.CellTemplate>
                 </tableView:TableViewTemplateColumn>

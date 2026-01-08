@@ -8,7 +8,6 @@ namespace WinDash2.Utils;
 public class FullscreenManagerService
 {
     private readonly AppWindow _appWindow;
-    private readonly OverlappedPresenter? _overlappedPresenter;
     
     private bool _isFullscreen;
     private Windows.Graphics.RectInt32 _previousBounds;
@@ -17,8 +16,7 @@ public class FullscreenManagerService
     {
         var hWnd = WindowNative.GetWindowHandle(window);
         var windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
-        _appWindow = AppWindow.GetFromWindowId(windowId);
-        _overlappedPresenter = _appWindow.Presenter as OverlappedPresenter;
+        _appWindow  = AppWindow.GetFromWindowId(windowId);
     }
 
     public void ToggleFullscreen()
@@ -57,20 +55,12 @@ public class FullscreenManagerService
         }
 
         // Restore overlapped presenter
-        if (_overlappedPresenter != null)
+        _appWindow.SetPresenter(AppWindowPresenterKind.Overlapped);
+        
+        if (_appWindow.Presenter is OverlappedPresenter presenter)
         {
-            _appWindow.SetPresenter(_overlappedPresenter);
-        }
-        else
-        {
-            _appWindow.SetPresenter(AppWindowPresenterKind.Overlapped);
-            
-            // Restore border settings if we had to create a new presenter
-            if (_appWindow.Presenter is OverlappedPresenter presenter)
-            {
-                presenter.SetBorderAndTitleBar(true, false);
-                presenter.IsResizable = false;
-            }
+            presenter.SetBorderAndTitleBar(true, false);
+            presenter.IsResizable = false;
         }
 
         // Restore previous bounds
