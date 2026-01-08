@@ -9,47 +9,79 @@
     xmlns:models="using:WinDash2.Models"
     xmlns:tableView="using:WinUI.TableView">
 
-    <StackPanel Padding="20">
-        <Grid Margin="0,0,0,10">
-            <TextBlock Text="Widget Library" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left"/>
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header with logo and buttons -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Left">
+                <Image Source="/Assets/logo96x96.png" Width="32" Height="32" VerticalAlignment="Center"/>
+                <TextBlock Text="Widget Library" FontSize="24" FontWeight="Bold" VerticalAlignment="Center"/>
+            </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                <Button Content="Create New Widget" Click="CreateButton_Click"/>
-                <Button Content="Settings" Click="SettingsButton_Click"/>
+                <Button Click="CreateButton_Click" Style="{StaticResource AccentButtonStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE710;" FontSize="16"/>
+                        <TextBlock Text="Create New Widget"/>
+                    </StackPanel>
+                </Button>
+                <Button Click="SettingsButton_Click" ToolTipService.ToolTip="Settings">
+                    <FontIcon Glyph="&#xE713;" FontSize="16"/>
+                </Button>
             </StackPanel>
         </Grid>
-        <TextBox PlaceholderText="Search widgets..." Margin="0,0,0,10" TextChanged="SearchBox_TextChanged"/>
+        
+        <!-- Search box -->
+        <TextBox Grid.Row="1" PlaceholderText="Search widgets..." Margin="0,0,0,16" TextChanged="SearchBox_TextChanged"/>
+        
+        <!-- Table takes remaining space -->
         <tableView:TableView
+            Grid.Row="2"
             ItemsSource="{x:Bind FilteredWidgets}"
             AutoGenerateColumns="False"
             SelectionMode="None"
             CanResizeColumns="False"
-            CanSortColumns="True"
-            Height="500">
+            CanSortColumns="True">
 
             <tableView:TableView.Columns>
                 <tableView:TableViewTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
-                <tableView:TableViewTemplateColumn Header="Enabled" Width="Auto">
+                <tableView:TableViewTemplateColumn Header="Enabled" Width="90">
                     <tableView:TableViewTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="models:Widget">
-                            <ToggleSwitch IsOn="{x:Bind Enabled, Mode=TwoWay}" Toggled="ToggleSwitch_Toggled"/>
-
+                            <Grid HorizontalAlignment="Stretch">
+                                <ToggleSwitch 
+                                    IsOn="{x:Bind Enabled, Mode=TwoWay}" 
+                                    Toggled="ToggleSwitch_Toggled"
+                                    OnContent=""
+                                    OffContent=""
+                                    HorizontalAlignment="Center"/>
+                            </Grid>
                         </DataTemplate>
                     </tableView:TableViewTemplateColumn.CellTemplate>
                 </tableView:TableViewTemplateColumn>
-                <tableView:TableViewTemplateColumn Header="Actions" Width="Auto">
+                <tableView:TableViewTemplateColumn Header="Actions" Width="90">
                     <tableView:TableViewTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="models:Widget">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <Button Content="Edit" Click="EditButton_Click"/>
-                                <Button Content="Delete" 
-                                        Click="DeleteButton_Click"
-                                        Background="#E74856"
-                                        Foreground="White"/>
-                            </StackPanel>
+                            <Grid HorizontalAlignment="Stretch">
+                                <StackPanel Orientation="Horizontal" Spacing="4" HorizontalAlignment="Center">
+                                    <Button Click="EditButton_Click" ToolTipService.ToolTip="Edit Widget" Padding="8">
+                                        <FontIcon Glyph="&#xE70F;" FontSize="16"/>
+                                    </Button>
+                                    <Button Click="DeleteButton_Click" 
+                                            ToolTipService.ToolTip="Delete Widget"
+                                            Padding="8">
+                                        <FontIcon Glyph="&#xE74D;" FontSize="16" Foreground="#E74856"/>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </tableView:TableViewTemplateColumn.CellTemplate>
                 </tableView:TableViewTemplateColumn>
             </tableView:TableView.Columns>
         </tableView:TableView>
-    </StackPanel>
+    </Grid>
 </Page>
