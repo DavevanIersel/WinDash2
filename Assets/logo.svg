@@ -53,8 +53,8 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="1.8683333"
-     inkscape:cx="53.791259"
-     inkscape:cy="44.157003"
+     inkscape:cx="54.594113"
+     inkscape:cy="86.975916"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="4472"
@@ -83,32 +83,36 @@
        id="title1" />
     <path
        class="cls-1"
-       d="m 26.68,27.81 h -15 a 2,2 0 0 1 -2,-2 V 7.37 a 2,2 0 0 1 2,-2 h 15 a 2,2 0 0 1 2,2 v 9.83 a 2,2 0 0 1 -4,0 V 9.37 h -11 v 14.44 h 11 v -0.18 a 2,2 0 0 1 4,0 v 2.18 a 2,2 0 0 1 -2,2 z"
-       id="path1" />
+       d="M 26.029839,26.312902 H 9.7435051 A 2.1715111,2.1715111 0 0 1 7.5719938,24.141391 V 4.120058 A 2.1715111,2.1715111 0 0 1 9.7435051,1.9485468 H 26.029839 a 2.1715111,2.1715111 0 0 1 2.17151,2.1715112 v 10.672978 a 2.1715111,2.1715111 0 0 1 -4.343021,0 V 6.2915692 H 11.915016 V 21.969879 h 11.943312 v -0.195435 a 2.1715111,2.1715111 0 0 1 4.343021,0 v 2.366947 a 2.1715111,2.1715111 0 0 1 -2.17151,2.171511 z"
+       id="path1"
+       style="stroke-width:1.08576" />
     <path
        class="cls-2"
-       d="M 52.31,27.81 H 34.06 a 2,2 0 0 1 -2,-2 V 7.37 a 2,2 0 0 1 2,-2 h 18.25 a 2,2 0 0 1 2,2 v 18.44 a 2,2 0 0 1 -2,2 z m -16.25,-4 H 50.31 V 9.37 H 36.06 Z"
-       id="path2" />
+       d="M 53.857754,26.312902 H 34.042715 A 2.1715111,2.1715111 0 0 1 31.871204,24.141391 V 4.120058 a 2.1715111,2.1715111 0 0 1 2.171511,-2.1715112 h 19.815039 a 2.1715111,2.1715111 0 0 1 2.171511,2.1715112 v 20.021333 a 2.1715111,2.1715111 0 0 1 -2.171511,2.171511 z M 36.214226,21.969879 H 51.686243 V 6.2915692 H 36.214226 Z"
+       id="path2"
+       style="stroke-width:1.08576" />
     <path
        class="cls-2"
-       d="m 33.59,58.63 h -21.9 a 2,2 0 0 1 -2,-2 V 33 a 2,2 0 0 1 2,-2 H 15 a 2,2 0 1 1 0,4 h -1.31 v 19.63 h 17.9 V 35 H 21.15 a 2,2 0 0 1 0,-4 h 12.44 a 2,2 0 0 1 2,2 v 23.63 a 2,2 0 0 1 -2,2 z"
-       id="path3" />
+       d="M 33.53241,59.775888 H 9.7543626 A 2.1715111,2.1715111 0 0 1 7.5828514,57.604377 V 31.947973 a 2.1715111,2.1715111 0 0 1 2.1715112,-2.171511 h 3.5938504 a 2.1715115,2.1715115 0 1 1 0,4.343023 H 11.925874 V 55.432866 H 31.360899 V 34.119485 H 20.02561 a 2.1715115,2.1715115 0 0 1 0,-4.343023 h 13.5068 a 2.1715111,2.1715111 0 0 1 2.171511,2.171511 v 25.656404 a 2.1715111,2.1715111 0 0 1 -2.171511,2.171511 z"
+       id="path3"
+       style="stroke-width:1.08576" />
     <path
        class="cls-2"
-       d="M 52.31,58.63 H 40.4 a 2,2 0 0 1 -2,-2 V 33 a 2,2 0 0 1 2,-2 h 11.91 a 2,2 0 0 1 2,2 v 14.91 a 2,2 0 0 1 -4,0 V 35 H 42.4 v 19.63 h 7.93 a 2.0056171,2.0056171 0 0 1 4,0.3 v 1.7 a 2,2 0 0 1 -2.02,2 z"
-       id="path4" />
+       d="M 53.857754,59.775888 H 40.926405 A 2.1715111,2.1715111 0 0 1 38.754894,57.604377 V 31.947973 a 2.1715111,2.1715111 0 0 1 2.171511,-2.171511 h 12.931349 a 2.1715111,2.1715111 0 0 1 2.171511,2.171511 v 16.188616 a 2.1715112,2.1715112 0 0 1 -4.343022,0 V 34.119485 h -8.588326 v 21.313381 h 8.610042 a 2.17761,2.17761 0 0 1 4.343021,0.325727 v 1.845784 a 2.1715111,2.1715111 0 0 1 -2.193226,2.171511 z"
+       id="path4"
+       style="stroke-width:1.08576" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:42.8547px;font-family:'Yu Gothic UI';-inkscape-font-specification:'Yu Gothic UI Bold';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#ffbe00;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
-       x="48.762386"
-       y="57.040085"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:61.2462px;font-family:'Yu Gothic UI';-inkscape-font-specification:'Yu Gothic UI Bold';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#ffbe00;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
+       x="50.127083"
+       y="53.437038"
        id="text4"
        transform="matrix(0,1,1,0,0,0)"
        inkscape:label="2"><tspan
          sodipodi:role="line"
          id="tspan4"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:42.8547px;font-family:'Yu Gothic UI';-inkscape-font-specification:'Yu Gothic UI Bold';fill:#ffbe00;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
-         x="48.762386"
-         y="57.040085">2</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:61.2462px;font-family:'Yu Gothic UI';-inkscape-font-specification:'Yu Gothic UI Bold';fill:#ffbe00;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
+         x="50.127083"
+         y="53.437038">2</tspan></text>
   </g>
 </svg>
