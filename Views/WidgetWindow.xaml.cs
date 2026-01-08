@@ -64,6 +64,10 @@ public sealed partial class WidgetWindow : Window
         SetupTitleBar();
         SetDraggable(false);
 
+        // Set window title to widget name
+        Title = _widget.Name;
+        WidgetTitle.Text = _widget.Name;
+
         appWindow.MoveAndResize(new Windows.Graphics.RectInt32(_widget.X, _widget.Y, _widget.Width, _widget.Height));
         appWindow.IsShownInSwitchers = false;
 
@@ -88,6 +92,9 @@ public sealed partial class WidgetWindow : Window
             presenter.IsMaximizable = false;
             presenter.IsMinimizable = false;
         }
+
+        // Hide the titlebar icon
+        appWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
     }
 
     public void SetDraggable(bool showFrame)
@@ -97,7 +104,21 @@ public sealed partial class WidgetWindow : Window
         presenter.IsResizable = showFrame;
         presenter.SetBorderAndTitleBar(true, showFrame);
 
-        if (!showFrame)
+        // Show/hide custom drag bar overlay
+        DragBar.Visibility = showFrame ? Visibility.Visible : Visibility.Collapsed;
+
+        if (showFrame && DragBar.XamlRoot != null)
+        {
+            // Set the entire drag bar as draggable area, except the close button
+            var scale = DragBar.XamlRoot.RasterizationScale;
+            var dragBarRect = new Windows.Graphics.RectInt32(
+                0, 0,
+                (int)(appWindow.Size.Width),
+                (int)(32 * scale)
+            );
+            appWindow.TitleBar.SetDragRectangles([dragBarRect]);
+        }
+        else
         {
             SetTitleBar(null);
             appWindow.TitleBar.SetDragRectangles([]);
@@ -169,6 +190,11 @@ public sealed partial class WidgetWindow : Window
         _widget.Height = finalHeight;
 
         _widgetManager.SaveWidget(_widget, false);
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        this.Close();
     }
 
     [DllImport("user32.dll", SetLastError = true)]

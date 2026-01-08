@@ -7,5 +7,39 @@
     xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d">
 
-    <controls:WebView2 x:Name="WidgetWebView" />
+    <Grid>
+        <controls:WebView2 x:Name="WidgetWebView" />
+        
+        <!-- Semi-transparent drag bar overlay -->
+        <Border x:Name="DragBar" 
+                VerticalAlignment="Top" 
+                Height="32"
+                Background="#80000000"
+                Visibility="Collapsed">
+            <Grid>
+                <TextBlock x:Name="WidgetTitle"
+                           Text="Widget"
+                           Foreground="White"
+                           VerticalAlignment="Center"
+                           Margin="12,0,0,0"
+                           FontSize="12"/>
+                <Button x:Name="CloseButton"
+                        Content="&#xE8BB;"
+                        FontFamily="Segoe MDL2 Assets"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Width="46"
+                        Height="32"
+                        Background="Transparent"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Click="CloseButton_Click">
+                    <Button.Resources>
+                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#20FFFFFF"/>
+                        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#40FFFFFF"/>
+                    </Button.Resources>
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>
