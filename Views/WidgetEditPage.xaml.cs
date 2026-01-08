@@ -3,9 +3,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Web.WebView2.Core;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using WinDash2.Core;
 using WinDash2.Models;
 using WinDash2.WidgetOptions;
@@ -28,6 +30,7 @@ public sealed partial class WidgetEditPage : Page
     private WidgetManager? _widgetManager;
     private bool _isNewWidget;
     public Widget Widget { get; set; }
+    public ObservableCollection<ForceInCurrentTabPattern> ForceInCurrentTabPatterns { get; } = new();
 
     private static readonly IWidgetOption[] Options =
     [
@@ -96,12 +99,32 @@ public sealed partial class WidgetEditPage : Page
 
             Widget.PropertyChanged += Widget_PropertyChanged;
             TouchEnabledSwitch.IsOn = Widget.TouchEnabled.GetValueOrDefault();
+            
+            // Load ForceInCurrentTab patterns
+            ForceInCurrentTabPatterns.Clear();
+            if (Widget.ForceInCurrentTab != null)
+            {
+                foreach (var pattern in Widget.ForceInCurrentTab)
+                {
+                    ForceInCurrentTabPatterns.Add(new ForceInCurrentTabPattern { Pattern = pattern });
+                }
+            }
         }
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         if (_widgetManager == null) return;
+
+        // Convert ForceInCurrentTab patterns back to strings
+        Widget.ForceInCurrentTab = ForceInCurrentTabPatterns
+            .Select(p => p.Pattern)
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .ToList();
+        Widget.ForceInCurrentTab = ForceInCurrentTabPatterns
+            .Select(p => p.Pattern)
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .ToList();
 
         if (_isNewWidget)
         {
@@ -163,6 +186,21 @@ public sealed partial class WidgetEditPage : Page
         UserAgentsList.ItemsSource = null;
         UserAgentsList.ItemsSource = Widget.CustomUserAgent;
         UpdatePreview();
+    }
+
+    private void AddForceInCurrentTab_Click(object sender, RoutedEventArgs e)
+    {
+        ForceInCurrentTabPatterns.Add(new ForceInCurrentTabPattern { Pattern = "" });
+        UpdatePreview();
+    }
+
+    private void RemoveForceInCurrentTab_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is ForceInCurrentTabPattern pattern)
+        {
+            ForceInCurrentTabPatterns.Remove(pattern);
+            UpdatePreview();
+        }
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
