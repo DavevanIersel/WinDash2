@@ -36,7 +36,6 @@ public sealed partial class WidgetEditPage : Page
     [
         new FunctionKeyActions(),
         new UserAgentOption(),
-        new PermissionsOption(),
         new TouchOption(),
         new ForceInCurrentTabOption(),
         new HideScrollbarOption(),

@@ -115,12 +115,6 @@ public class Widget : INotifyPropertyChanged
     public List<UserAgentMapping>? CustomUserAgent { get; set; } = [];
 
     /// <summary>
-    /// Mapping of permissions to auto-accept/deny for this widget.
-    /// </summary>
-    [JsonPropertyName("permissions")]
-    public Dictionary<Permission, bool?> Permissions { get; set; } = new();
-
-    /// <summary>
     /// Custom JavaScript code to be injected and executed on the widget page.
     /// </summary>
     [JsonPropertyName("customScript")]

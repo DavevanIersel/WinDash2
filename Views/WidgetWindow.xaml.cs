@@ -37,7 +37,6 @@ public sealed partial class WidgetWindow : Window
     [
         new FunctionKeyActions(),
         new UserAgentOption(),
-        new PermissionsOption(),
         new TouchOption(),
         new ForceInCurrentTabOption(),
         new HideScrollbarOption(),
