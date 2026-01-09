@@ -8,11 +8,7 @@ It is a complete rewrite of WinDash, focused on simplicity, performance, and nat
 -   **Portable by Design**: No installer, no registry writes — just run the executable.
 -   **Built for Windows**: Windows 10/11 only.
 -   **Stack**: .NET 8, WinUI 3
-
-![image](https://github.com/user-attachments/assets/add30fa0-ccac-4239-a6c9-f2fd0a005548)
-![image](https://github.com/user-attachments/assets/e3197f7f-c46f-47ea-9cf1-88e07b750cf8)
-![image](https://github.com/user-attachments/assets/e83ff5ac-f941-41b7-badb-d80b814f4f17)
-
+  
 ---
 
 ## Usage
