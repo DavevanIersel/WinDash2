@@ -119,6 +119,35 @@
                     </StackPanel>
                 </Border>
             </StackPanel>
+
+            <!-- Startup Section -->
+            <StackPanel Spacing="12">
+                <TextBlock 
+                    Text="Application Startup" 
+                    FontSize="14" 
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16">
+                    <StackPanel Spacing="8">
+                        <ToggleSwitch 
+                            x:Name="StartupToggleSwitch"
+                            Header="Launch at Windows startup"
+                            OnContent="Enabled"
+                            OffContent="Disabled"
+                            Toggled="OnStartupToggled"/>
+                        <TextBlock 
+                            Text="Automatically start WinDash2 when Windows starts"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            TextWrapping="Wrap"
+                            FontSize="13"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </Page>

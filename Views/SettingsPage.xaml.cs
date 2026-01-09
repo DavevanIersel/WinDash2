@@ -10,10 +10,12 @@ public sealed partial class SettingsPage : Page
 {
     private SettingsService? _settingsService;
     private GridService? _gridService;
+    private StartupService? _startupService;
 
     public SettingsPage()
     {
         InitializeComponent();
+        _startupService = new StartupService();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -38,6 +40,12 @@ public sealed partial class SettingsPage : Page
             }
 
             GridSizeNumberBox.Value = settings.GridSize;
+            
+            // Load startup setting
+            if (_startupService != null)
+            {
+                StartupToggleSwitch.IsOn = _startupService.IsStartupEnabled();
+            }
         }
     }
 
@@ -67,6 +75,17 @@ public sealed partial class SettingsPage : Page
         if (Frame.CanGoBack)
         {
             Frame.GoBack();
+        }
+    }
+
+    private void OnStartupToggled(object sender, RoutedEventArgs e)
+    {
+        if (_startupService == null) return;
+        
+        var toggleSwitch = sender as ToggleSwitch;
+        if (toggleSwitch != null)
+        {
+            _startupService.SetStartupEnabled(toggleSwitch.IsOn);
         }
     }
 }

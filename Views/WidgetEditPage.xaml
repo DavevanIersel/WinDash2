@@ -85,7 +85,6 @@
 
                 <!-- Basic Info Section -->
                 <StackPanel Spacing="12">
-                    <TextBlock Text="Basic Information" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                     <TextBox Header="Name" Text="{x:Bind Widget.Name, Mode=TwoWay}" />
                 </StackPanel>
 
