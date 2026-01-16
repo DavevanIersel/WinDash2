@@ -148,6 +148,32 @@
                     </StackPanel>
                 </Border>
             </StackPanel>
+
+            <!-- Widget Folder Section -->
+            <StackPanel Spacing="12">
+                <TextBlock 
+                    Text="Widget Folder" 
+                    FontSize="14" 
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16">   
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Current folder:" FontWeight="SemiBold"/>
+                        <TextBox x:Name="WidgetFolderTextBox" IsReadOnly="True" TextWrapping="Wrap"/>
+
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <Button Content="Open Folder" Click="OpenWidgetFolder_Click"/>
+                            <Button Content="Change..." Click="ChangeWidgetFolder_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
         </StackPanel>
     </ScrollViewer>
 </Page>

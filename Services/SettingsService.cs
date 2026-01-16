@@ -3,27 +3,19 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using WinDash2.Models;
+using WinDash2.Utils;
 
 namespace WinDash2.Services;
 
 public class SettingsService
 {
-    private readonly string _settingsFilePath;
     private readonly JsonSerializerOptions _jsonOptions;
     private Settings _settings;
+    public Settings GetSettings() => _settings;
+    private string SettingsFilePath => Path.Combine(DirectoryUtil.GetSettingsFolder(), "settings.json");
 
-    public SettingsService(string settingsFolderPath)
+    public SettingsService()
     {
-        ArgumentNullException.ThrowIfNull(settingsFolderPath);
-
-        if (!Directory.Exists(settingsFolderPath))
-        {
-            Debug.WriteLine($"Directory '{settingsFolderPath}' not found. Creating...");
-            Directory.CreateDirectory(settingsFolderPath);
-        }
-
-        _settingsFilePath = Path.Combine(settingsFolderPath, "settings.json");
-        
         _jsonOptions = new JsonSerializerOptions
         {
             WriteIndented = true,
@@ -32,25 +24,36 @@ public class SettingsService
 
         _settings = LoadSettings();
     }
-
     private Settings LoadSettings()
     {
-        if (!File.Exists(_settingsFilePath))
+        var path = SettingsFilePath;
+
+        var folder = Path.GetDirectoryName(path)!;
+        if (!Directory.Exists(folder))
         {
-            Debug.WriteLine($"Settings file not found at '{_settingsFilePath}'. Creating default settings.");
-            var defaultSettings = new Settings();
+            Debug.WriteLine($"Directory '{folder}' not found. Creating...");
+            Directory.CreateDirectory(folder);
+        }
+
+        if (!File.Exists(path))
+        {
+            Debug.WriteLine($"Settings file not found at '{path}'. Creating default settings.");
+            var defaultSettings = new Settings
+            {
+                WidgetsFolderPath = Path.Combine(folder, "widgets")
+            };
             SaveSettings(defaultSettings);
             return defaultSettings;
         }
 
         try
         {
-            var json = File.ReadAllText(_settingsFilePath);
+            var json = File.ReadAllText(path);
             var settings = JsonSerializer.Deserialize<Settings>(json, _jsonOptions);
-            
+
             if (settings != null)
             {
-                Debug.WriteLine($"Loaded settings from '{_settingsFilePath}'");
+                Debug.WriteLine($"Loaded settings from '{path}'");
                 return settings;
             }
             else
@@ -66,19 +69,14 @@ public class SettingsService
         }
     }
 
-    public Settings GetSettings()
-    {
-        return _settings;
-    }
-
     public void SaveSettings(Settings settings)
     {
         try
         {
             _settings = settings;
             var json = JsonSerializer.Serialize(settings, _jsonOptions);
-            File.WriteAllText(_settingsFilePath, json);
-            Debug.WriteLine($"Settings saved to '{_settingsFilePath}'");
+            File.WriteAllText(SettingsFilePath, json);
+            Debug.WriteLine($"Settings saved to '{SettingsFilePath}'");
         }
         catch (Exception ex)
         {

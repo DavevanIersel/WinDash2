@@ -34,6 +34,13 @@ public class WidgetManager
         }
     }
 
+    public void ReloadWidgets()
+    {
+        CloseAllWidgets();
+        _widgetConfigs.Clear();
+        Initialize();
+    }
+
     //private void move_external_windows_experiment()
     //{
     //    [DllImport("user32.dll")]
@@ -139,7 +146,7 @@ public class WidgetManager
         
         foreach (var window in _widgetWindows.Values)
         {
-            window.Close();
+            window.CloseForRerender();
         }
         _widgetWindows.Clear();
     }
