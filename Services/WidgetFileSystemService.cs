@@ -100,7 +100,7 @@ public class WidgetFileSystemService
         }
         else
         {
-            throw new FileNotFoundException($"Deleting File: Widget config with name '{widget.Name}' and path '{widgetFilePath}' not found.");
+            throw new FileNotFoundException($"Cannot delete widget: file not found at path '{widgetFilePath}'.");
         }
     }
 }

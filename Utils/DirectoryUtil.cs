@@ -96,7 +96,7 @@ public static class DirectoryUtil
         });
     }
 
-    public async static Task<Windows.Storage.StorageFolder> PickFolderAsync(IntPtr hwnd, string allowedFileTypes)
+    public static async Task<Windows.Storage.StorageFolder> PickFolderAsync(IntPtr hwnd, string allowedFileTypes)
     {
         var folderPicker = new Windows.Storage.Pickers.FolderPicker
         {
