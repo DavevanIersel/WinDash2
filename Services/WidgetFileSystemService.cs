@@ -1,23 +1,23 @@
-﻿using Microsoft.UI.Xaml;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
-using System.Threading.Tasks;
 using WinDash2.Models;
-
+using WinDash2.Utils;
 
 namespace WinDash2.Services;
 
 public class WidgetFileSystemService
 {
-    private readonly string _widgetsFolderPath;
+    private readonly SettingsService _settingsService;
     private readonly JsonSerializerOptions _jsonOptions;
+    private string WidgetsFolderPath => DirectoryUtil.GetWidgetsFolder(_settingsService.GetSettings());
 
-    public WidgetFileSystemService(string widgetsFolderPath)
+
+    public WidgetFileSystemService(SettingsService settingsService)
     {
-        _widgetsFolderPath = widgetsFolderPath ?? throw new ArgumentNullException(nameof(widgetsFolderPath));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
 
         _jsonOptions = new JsonSerializerOptions
         {
@@ -25,16 +25,19 @@ public class WidgetFileSystemService
             PropertyNameCaseInsensitive = true
         };
     }
-
     public List<Widget> LoadAllWidgets()
     {
-        if (!Directory.Exists(_widgetsFolderPath))
+        var path = WidgetsFolderPath;
+
+        Debug.WriteLine($"Widget directory: '{path}'");
+
+        if (!Directory.Exists(path))
         {
-            Debug.WriteLine($"Directory '{_widgetsFolderPath}' not found. Creating...");
-            Directory.CreateDirectory(_widgetsFolderPath);
+            Debug.WriteLine($"Directory '{path}' not found. Creating...");
+            Directory.CreateDirectory(path);
         }
 
-        var widgetFiles = Directory.GetFiles(_widgetsFolderPath, "*.widget.json", SearchOption.AllDirectories);
+        var widgetFiles = Directory.GetFiles(path, "*.widget.json", SearchOption.AllDirectories);
         var widgets = new List<Widget>();
 
         foreach (var file in widgetFiles)
@@ -45,13 +48,12 @@ public class WidgetFileSystemService
                 Debug.WriteLine($"Reading file: {file} ({fileInfo.Length} bytes)");
 
                 var json = ReadFileContent(file);
-
                 var widget = JsonSerializer.Deserialize<Widget>(json, _jsonOptions);
 
                 if (widget != null)
                 {
                     widget.Id ??= Guid.NewGuid();
-                    widget.FileName = Path.GetRelativePath(_widgetsFolderPath, file);
+                    widget.FileName = Path.GetRelativePath(path, file);
                     widgets.Add(widget);
                     Debug.WriteLine($"Loaded widget: {widget.Name} ({widget.Id})");
                 }
@@ -70,44 +72,35 @@ public class WidgetFileSystemService
         return widgets;
     }
 
-    string ReadFileContent(string path)
+    private static string ReadFileContent(string path)
     {
         using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }
 
-
     public void SaveWidget(Widget widget)
     {
         ArgumentNullException.ThrowIfNull(widget.FileName);
 
-        var widgetFilePath = Path.Combine(_widgetsFolderPath, widget.FileName);
-
-        if (widgetFilePath != null)
-        {
-            using var stream = File.Create(widgetFilePath);
-            JsonSerializer.SerializeAsync(stream, widget, _jsonOptions);
-        }
-        else
-        {
-            throw new FileNotFoundException($"Widget config with name '{widget.Name}' and path '{widgetFilePath}' not found.");
-        }
+        var widgetFilePath = Path.Combine(WidgetsFolderPath, widget.FileName);
+        using var stream = File.Create(widgetFilePath);
+        JsonSerializer.SerializeAsync(stream, widget, _jsonOptions);
     }
 
     public void DeleteWidget(Widget widget)
     {
         ArgumentNullException.ThrowIfNull(widget.FileName);
 
-        var widgetFilePath = Path.Combine(_widgetsFolderPath, widget.FileName);
+        var widgetFilePath = Path.Combine(WidgetsFolderPath, widget.FileName);
 
-        if (widgetFilePath != null)
+        if (File.Exists(widgetFilePath))
         {
             File.Delete(widgetFilePath);
         }
         else
         {
-            throw new FileNotFoundException($"Widget config with name '{widget.Name}' and path '{widgetFilePath}' not found.");
+            throw new FileNotFoundException($"Cannot delete widget: file not found at path '{widgetFilePath}'.");
         }
     }
 }

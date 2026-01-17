@@ -16,6 +16,7 @@ internal class TrayManager : IDisposable
     private readonly Func<ManagerWindow> _managerWindowFactory;
     private ManagerWindow? _managerWindow;
     private readonly WidgetManager _widgetManager;
+    public ManagerWindow? ActiveManagerWindow => _managerWindow;
 
     public TrayManager(Func<ManagerWindow> managerWindowFactory, WidgetManager widgetManager)
     {
