@@ -1,60 +1,48 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
+using System;
+using WinDash2.Core;
 using WinDash2.Models;
 using WinDash2.Services;
+using WinDash2.Utils;
 
 namespace WinDash2.Views;
 
 public sealed partial class SettingsPage : Page
 {
-    private SettingsService? _settingsService;
-    private GridService? _gridService;
-    private StartupService? _startupService;
+    private readonly WidgetManager _widgetManager;
+    private readonly SettingsService _settingsService;
+    private readonly StartupService _startupService;
 
     public SettingsPage()
     {
         InitializeComponent();
-        _startupService = new StartupService();
+
+        ArgumentNullException.ThrowIfNull(App.AppHost);
+        _widgetManager = App.AppHost.Services.GetRequiredService<WidgetManager>();
+        _settingsService = App.AppHost.Services.GetRequiredService<SettingsService>();
+        _startupService = App.AppHost.Services.GetRequiredService<StartupService>();
+
+        InitializeSettings();
     }
 
-    protected override void OnNavigatedTo(NavigationEventArgs e)
+    private void InitializeSettings()
     {
-        base.OnNavigatedTo(e);
+        var settings = _settingsService.GetSettings();
 
-        var parameters = e.Parameter as (SettingsService, GridService)?;
-        if (parameters.HasValue)
-        {
-            _settingsService = parameters.Value.Item1;
-            _gridService = parameters.Value.Item2;
+        GridSizeNumberBox.Value = settings.GridSize;
+        StartupToggleSwitch.IsOn = _startupService.IsStartupEnabled();
+        WidgetFolderTextBox.Text = settings.WidgetsFolderPath;
 
-            var settings = _settingsService.GetSettings();
-            
-            if (settings.DragMode == DragMode.Free)
-            {
-                FreeDragRadioButton.IsChecked = true;
-            }
-            else
-            {
-                GridBasedRadioButton.IsChecked = true;
-            }
-
-            GridSizeNumberBox.Value = settings.GridSize;
-            
-            // Load startup setting
-            if (_startupService != null)
-            {
-                StartupToggleSwitch.IsOn = _startupService.IsStartupEnabled();
-            }
-        }
+        FreeDragRadioButton.IsChecked = settings.DragMode == DragMode.Free;
+        GridBasedRadioButton.IsChecked = settings.DragMode == DragMode.GridBased;
     }
 
     private void OnDragModeChanged(object sender, RoutedEventArgs e)
     {
-        if (_settingsService == null) return;
-
-        var dragMode = FreeDragRadioButton.IsChecked == true 
-            ? DragMode.Free 
+        var dragMode = FreeDragRadioButton.IsChecked == true
+            ? DragMode.Free
             : DragMode.GridBased;
 
         _settingsService.UpdateDragMode(dragMode);
@@ -62,8 +50,6 @@ public sealed partial class SettingsPage : Page
 
     private void OnGridSizeChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
     {
-        if (_settingsService == null) return;
-        
         if (!double.IsNaN(args.NewValue))
         {
             _settingsService.UpdateGridSize((int)args.NewValue);
@@ -80,12 +66,33 @@ public sealed partial class SettingsPage : Page
 
     private void OnStartupToggled(object sender, RoutedEventArgs e)
     {
-        if (_startupService == null) return;
-        
         var toggleSwitch = sender as ToggleSwitch;
         if (toggleSwitch != null)
         {
             _startupService.SetStartupEnabled(toggleSwitch.IsOn);
+        }
+    }
+
+    private void OpenWidgetFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var path = _settingsService.GetSettings().WidgetsFolderPath;
+        DirectoryUtil.OpenDirectoryInFileExplorer(path);
+    }
+
+    private async void ChangeWidgetFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var hwnd = WindowUtil.GetActiveWindowHandle<TrayManager>(trayManager => trayManager.ActiveManagerWindow);
+        var pickedFolder = await DirectoryUtil.PickFolderAsync(hwnd, "*");
+
+        if (pickedFolder != null)
+        {
+            var settings = _settingsService.GetSettings();
+            settings.WidgetsFolderPath = pickedFolder.Path;
+            _settingsService.SaveSettings(settings);
+
+            WidgetFolderTextBox.Text = pickedFolder.Path;
+
+            _widgetManager.ReloadWidgets();
         }
     }
 }

@@ -3,9 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Linq;
 using WinDash2.Core;
 using WinDash2.Models;
@@ -151,8 +149,6 @@ public sealed partial class WidgetLibraryPage : Page
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        var settingsService = App.AppHost.Services.GetRequiredService<SettingsService>();
-        var gridService = App.AppHost.Services.GetRequiredService<GridService>();
-        Frame.Navigate(typeof(SettingsPage), (settingsService, gridService));
+        Frame.Navigate(typeof(SettingsPage));
     }
 }

@@ -19,6 +19,7 @@ public partial class App : Application
         AppHost = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
             {
+                services.AddSingleton<StartupService>();
                 services.AddSingleton<SettingsService>();
                 services.AddSingleton<WidgetFileSystemService>();
                 services.AddSingleton<GridService>();
