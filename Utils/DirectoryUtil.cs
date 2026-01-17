@@ -82,15 +82,15 @@ public static class DirectoryUtil
             return;
         }
 
-        if (!Directory.Exists(path))
+        if (!Directory.Exists(fullPath))
         {
-            Debug.WriteLine($"OpenDirectoryInFileExplorer: Directory does not exist at path '{path}'.");
+            Debug.WriteLine($"OpenDirectoryInFileExplorer: Directory does not exist at path '{fullPath}'.");
             return;
         }
 
         Process.Start(new ProcessStartInfo
         {
-            FileName = path,
+            FileName = fullPath,
             UseShellExecute = true,
             Verb = "open"
         });
