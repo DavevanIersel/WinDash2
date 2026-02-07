@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -80,6 +81,8 @@ public sealed partial class WidgetWindow : Window
 
         this.Closed += OnWindowClosed;
 
+        await LoadFaviconAsync();
+
         try
         {
             await CustomWidgetLoader.LoadAsync(_widget, WidgetWebView);
@@ -87,6 +90,26 @@ public sealed partial class WidgetWindow : Window
         catch (Exception ex)
         {
             ShowError("Error Loading Widget", ex.Message);
+        }
+    }
+
+    private async Task LoadFaviconAsync()
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNull(App.AppHost);
+            var widgetFileSystemService = App.AppHost.Services.GetRequiredService<WidgetFileSystemService>();
+
+            var bitmap = await FaviconUtil.LoadFaviconAsync(_widget, widgetFileSystemService.WidgetsFolderPath);
+            if (bitmap != null)
+            {
+                DragBarFaviconImage.Source = bitmap;
+                DragBarFaviconImage.Visibility = Visibility.Visible;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to load favicon for widget '{_widget.Name}': {ex.Message}");
         }
     }
 

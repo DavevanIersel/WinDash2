@@ -6,12 +6,15 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using WinDash2.Core;
 using WinDash2.Models;
+using WinDash2.Services;
+using WinDash2.Utils;
 
 namespace WinDash2.Views;
 
 public sealed partial class WidgetLibraryPage : Page
 {
     private readonly WidgetManager _widgetManager;
+    private readonly WidgetFileSystemService _widgetFileSystemService;
     private readonly ObservableCollection<Widget> _allWidgets = [];
     public ObservableCollection<Widget> FilteredWidgets { get; } = [];
 
@@ -21,6 +24,7 @@ public sealed partial class WidgetLibraryPage : Page
 
         ArgumentNullException.ThrowIfNull(App.AppHost);
         _widgetManager = App.AppHost.Services.GetRequiredService<WidgetManager>();
+        _widgetFileSystemService = App.AppHost.Services.GetRequiredService<WidgetFileSystemService>();
 
         InitializeWidgets();
     }
@@ -143,5 +147,22 @@ public sealed partial class WidgetLibraryPage : Page
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
         Frame.Navigate(typeof(SettingsPage));
+    }
+
+    private async void FaviconImage_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Image image || image.DataContext is not Widget widget)
+        {
+            return;
+        }
+
+        try
+        {
+            image.Source = await FaviconUtil.LoadFaviconAsync(widget, _widgetFileSystemService.WidgetsFolderPath);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load favicon for widget '{widget.Name}': {ex.Message}");
+        }
     }
 }

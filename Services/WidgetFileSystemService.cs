@@ -12,8 +12,8 @@ public class WidgetFileSystemService
 {
     private readonly SettingsService _settingsService;
     private readonly JsonSerializerOptions _jsonOptions;
-    private string WidgetsFolderPath => DirectoryUtil.GetWidgetsFolder(_settingsService.GetSettings());
 
+    public string WidgetsFolderPath => DirectoryUtil.GetWidgetsFolder(_settingsService.GetSettings());
 
     public WidgetFileSystemService(SettingsService settingsService)
     {
@@ -25,6 +25,7 @@ public class WidgetFileSystemService
             PropertyNameCaseInsensitive = true
         };
     }
+
     public List<Widget> LoadAllWidgets()
     {
         var path = WidgetsFolderPath;
@@ -37,7 +38,7 @@ public class WidgetFileSystemService
             Directory.CreateDirectory(path);
         }
 
-        var widgetFiles = Directory.GetFiles(path, "*.widget.json", SearchOption.AllDirectories);
+        var widgetFiles = Directory.GetFiles(path, Widget.FileSearchPattern, SearchOption.AllDirectories);
         var widgets = new List<Widget>();
 
         foreach (var file in widgetFiles)
@@ -83,7 +84,7 @@ public class WidgetFileSystemService
     {
         ArgumentNullException.ThrowIfNull(widget.FileName);
 
-        var widgetFilePath = Path.Combine(WidgetsFolderPath, widget.FileName);
+        var widgetFilePath = GetWidgetFilePath(widget);
         using var stream = File.Create(widgetFilePath);
         JsonSerializer.SerializeAsync(stream, widget, _jsonOptions);
     }
@@ -92,7 +93,7 @@ public class WidgetFileSystemService
     {
         ArgumentNullException.ThrowIfNull(widget.FileName);
 
-        var widgetFilePath = Path.Combine(WidgetsFolderPath, widget.FileName);
+        var widgetFilePath = GetWidgetFilePath(widget);
 
         if (File.Exists(widgetFilePath))
         {
@@ -102,5 +103,28 @@ public class WidgetFileSystemService
         {
             throw new FileNotFoundException($"Cannot delete widget: file not found at path '{widgetFilePath}'.");
         }
+    }
+
+    /// <summary>
+    /// Gets the absolute path to a file within the widget's folder.
+    /// </summary>
+    private string GetAbsolutePath(Widget widget, string relativePath)
+    {
+        var widgetFolder = widget.GetFolderPath(WidgetsFolderPath);
+        if (!Directory.Exists(widgetFolder))
+        {
+            Directory.CreateDirectory(widgetFolder);
+        }
+        return Path.Combine(widgetFolder, relativePath);
+    }
+
+    /// <summary>
+    /// Gets the absolute path to the widget's JSON file.
+    /// </summary>
+    private string GetWidgetFilePath(Widget widget)
+    {
+        ArgumentNullException.ThrowIfNull(widget.FileName);
+        var fileName = Path.GetFileName(widget.FileName);
+        return GetAbsolutePath(widget, fileName);
     }
 }

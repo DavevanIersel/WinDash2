@@ -76,23 +76,84 @@
                             <TextBlock Text="Back" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    <TextBlock Text="Edit Widget" 
+                    <TextBlock x:Name="PageTitle"
+                               Text="Edit Widget" 
                                FontSize="24" 
                                FontWeight="Bold" 
                                HorizontalAlignment="Left"
                                Margin="0,48,0,0"/>
+                    <Button x:Name="OpenFolderButton"
+                            Click="OpenWidgetFolder_Click"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Margin="0,48,0,0"
+                            ToolTipService.ToolTip="Open Widget Folder"
+                            Height="32"
+                            Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE8DA;" FontSize="14"/>
+                            <TextBlock Text="Open Folder" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                 </Grid>
 
                 <!-- Basic Info Section -->
                 <StackPanel Spacing="12">
-                    <TextBox Header="Name" Text="{x:Bind Widget.Name, Mode=TwoWay}" />
+                    <!-- Name input with favicon -->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Header -->
+                        <TextBlock Grid.Row="0" 
+                                   Text="Name" 
+                                   Margin="0,0,0,4"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"/>
+                        
+                        <!-- Composite control: Image + TextBox -->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Favicon Image -->
+                            <Image x:Name="NameFaviconImage"
+                                   Grid.Column="0"
+                                   Width="16"
+                                   Height="16"
+                                   Margin="10,0,0,0"
+                                   VerticalAlignment="Center"
+                                   Visibility="Collapsed"/>
+                            
+                            <!-- Favicon Loading Spinner -->
+                            <ProgressRing x:Name="FaviconSpinner"
+                                         Grid.Column="0"
+                                         Width="16"
+                                         Height="16"
+                                         Margin="10,0,0,0"
+                                         VerticalAlignment="Center"
+                                         Visibility="Collapsed"
+                                         IsActive="True"/>
+                            
+                            <!-- TextBox with adjusted left padding when favicon is visible -->
+                            <TextBox x:Name="NameTextBox"
+                                     Grid.Column="0"
+                                     Grid.ColumnSpan="2"
+                                     Text="{x:Bind Widget.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     TextChanged="OnInputChanged"/>
+                        </Grid>
+                    </Grid>
                 </StackPanel>
 
                 <!-- Source Section -->
                 <StackPanel Spacing="12">
                     <TextBlock Text="Source" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
-                    <TextBox x:Name="UrlTextBox" Header="URL" Text="{x:Bind Widget.Url, Mode=TwoWay}" TextChanged="OnUrlOrHtmlChanged" />
-                    <TextBox x:Name="HtmlTextBox" Header="HTML" Text="{x:Bind Widget.Html, Mode=TwoWay}" TextChanged="OnUrlOrHtmlChanged" />
+                    <TextBox x:Name="UrlTextBox" Header="URL" Text="{x:Bind Widget.Url, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="OnUrlOrHtmlChanged" />
+                    <TextBox x:Name="HtmlTextBox" Header="HTML" Text="{x:Bind Widget.Html, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="OnUrlOrHtmlChanged" />
                 </StackPanel>
 
                 <!-- Sizing Section -->
@@ -103,8 +164,8 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Header="Width" Text="{x:Bind Widget.Width, Mode=TwoWay}" />
-                        <TextBox Grid.Column="1" Header="Height" Text="{x:Bind Widget.Height, Mode=TwoWay}" />
+                        <TextBox Grid.Column="0" Header="Width" Text="{x:Bind Widget.Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="OnInputChanged" />
+                        <TextBox Grid.Column="1" Header="Height" Text="{x:Bind Widget.Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="OnInputChanged" />
                     </Grid>
                 </StackPanel>
 
@@ -112,6 +173,59 @@
                 <StackPanel Spacing="12">
                     <TextBlock Text="Input Settings" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
                     <ToggleSwitch x:Name="TouchEnabledSwitch" Header="Touch Enabled" Toggled="TouchEnabledSwitch_Toggled" OnContent="" OffContent=""/>
+                </StackPanel>
+
+                <!-- Custom Favicon Section -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Custom Favicon" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                    <TextBlock Text="Use a custom icon file instead of auto-detecting from the website." 
+                               FontSize="12" 
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" 
+                               TextWrapping="Wrap"/>
+                    
+                    <!-- Show custom favicon status when set -->
+                    <Border x:Name="CustomFaviconIndicator"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="12,8"
+                            Visibility="Collapsed">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0" 
+                                     Glyph="&#xE73E;" 
+                                     FontSize="16" 
+                                     Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                                     Margin="0,0,8,0"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" 
+                                      x:Name="CustomFaviconFilename"
+                                      Text="custom-favicon.ico"
+                                      VerticalAlignment="Center"
+                                      TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Border>
+                    
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Click="BrowseFavicon_Click"
+                                Height="32">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE8B7;" FontSize="14"/>
+                                <TextBlock Text="Browse for Favicon"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="DeleteCustomFaviconButton"
+                                Click="DeleteCustomFavicon_Click"
+                                Height="32"
+                                Visibility="Collapsed"
+                                ToolTipService.ToolTip="Delete Custom Favicon">
+                            <FontIcon Glyph="&#xE74D;" FontSize="14"/>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
 
                 <!-- Custom User Agents Section -->
@@ -211,7 +325,7 @@
 
                 <!-- Action Buttons -->
                 <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
-                    <Button Click="Save_Click" Style="{StaticResource AccentButtonStyle}">
+                    <Button x:Name="SaveButton" Click="Save_Click" Style="{StaticResource AccentButtonStyle}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon Glyph="&#xE74E;" FontSize="14"/>
                             <TextBlock Text="Save"/>

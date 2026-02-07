@@ -46,7 +46,7 @@ public static class CustomWidgetLoader
 
         // Get the widget's folder name (without .widget.json extension)
         var widgetFolderName = Path.GetFileNameWithoutExtension(widgetFileName ?? "custom");
-        if (widgetFolderName.EndsWith(".widget", StringComparison.OrdinalIgnoreCase))
+        if (widgetFolderName.EndsWith(Widget.FileExtension, StringComparison.OrdinalIgnoreCase))
         {
             widgetFolderName = Path.GetFileNameWithoutExtension(widgetFolderName);
         }

@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace WinDash2.Models;
 
-public class Widget : INotifyPropertyChanged
+public partial class Widget : INotifyPropertyChanged
 {
+    public const string FileExtension = ".widget";
+    public const string FullFileExtension = ".widget.json";
+    public const string FileSearchPattern = "*.widget.json";
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private bool _enabled;
@@ -141,6 +146,21 @@ public class Widget : INotifyPropertyChanged
     public List<string>? ForceInCurrentTab { get; set; } = [];
 
     /// <summary>
+    /// Relative path to the favicon file within the widget's folder. Not serialized if null or empty.
+    /// </summary>
+    [JsonPropertyName("faviconPath")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? FaviconPath { get; set; }
+
+    /// <summary>
+    /// Relative path to the custom favicon file within the widget's folder. Not serialized if null or empty.
+    /// If set, this takes precedence over FaviconPath when displaying the favicon.
+    /// </summary>
+    [JsonPropertyName("customFaviconPath")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? CustomFaviconPath { get; set; }
+
+    /// <summary>
     /// The filename for the widget configuration file. Not serialized.
     /// </summary>
     [JsonIgnore]
@@ -166,5 +186,76 @@ public class Widget : INotifyPropertyChanged
             return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// Gets the folder path for this widget within the specified widgets root directory.
+    /// </summary>
+    public string GetFolderPath(string widgetsRootPath)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(FileName);
+
+        var widgetFolderName = Path.GetFileNameWithoutExtension(FileName);
+        if (widgetFolderName.EndsWith(FileExtension, StringComparison.OrdinalIgnoreCase))
+        {
+            widgetFolderName = Path.GetFileNameWithoutExtension(widgetFolderName);
+        }
+
+        return Path.Combine(widgetsRootPath, widgetFolderName);
+    }
+
+    /// <summary>
+    /// Gets the absolute path to a file within this widget's folder.
+    /// </summary>
+    public string GetFilePath(string relativePath, string widgetsRootPath)
+    {
+        var widgetFolder = GetFolderPath(widgetsRootPath);
+        return Path.Combine(widgetFolder, relativePath);
+    }
+
+    /// <summary>
+    /// Creates a shallow copy of this widget for backup/restore purposes.
+    /// </summary>
+    public Widget Clone()
+    {
+        return new Widget
+        {
+            Id = Id,
+            Name = Name,
+            Url = Url,
+            Html = Html,
+            X = X,
+            Y = Y,
+            Width = Width,
+            Height = Height,
+            TouchEnabled = TouchEnabled,
+            Enabled = Enabled,
+            FileName = FileName,
+            ForceInCurrentTab = ForceInCurrentTab,
+            CustomUserAgent = CustomUserAgent,
+            FaviconPath = FaviconPath,
+            CustomFaviconPath = CustomFaviconPath
+        };
+    }
+
+    /// <summary>
+    /// Copies all properties from another widget instance to this one.
+    /// </summary>
+    public void CopyFrom(Widget other)
+    {
+        Id = other.Id;
+        Name = other.Name;
+        Url = other.Url;
+        Html = other.Html;
+        X = other.X;
+        Y = other.Y;
+        Width = other.Width;
+        Height = other.Height;
+        TouchEnabled = other.TouchEnabled;
+        Enabled = other.Enabled;
+        FileName = other.FileName;
+        ForceInCurrentTab = other.ForceInCurrentTab;
+        CustomUserAgent = other.CustomUserAgent;
+        FaviconPath = other.FaviconPath;
     }
 }

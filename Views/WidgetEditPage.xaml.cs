@@ -1,7 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using Microsoft.Web.WebView2.Core;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,11 +12,10 @@ using System.Threading.Tasks;
 using WinDash2.Core;
 using WinDash2.Models;
 using WinDash2.Utils;
+using WinDash2.Services;
 using WinDash2.WidgetOptions;
 using WinDash2.WidgetOptions.FunctionKeyActions;
 using WinDash2.WidgetOptions.HideScrollbarOption;
-using Windows.Foundation;
-using Windows.UI.WebUI;
 
 namespace WinDash2.Views;
 
@@ -30,7 +29,12 @@ public class WidgetEditArgs
 public sealed partial class WidgetEditPage : Page
 {
     private WidgetManager? _widgetManager;
+    private WidgetFileSystemService? _widgetFileSystemService;
     private bool _isNewWidget;
+    private Widget? _originalWidget;
+    private WidgetEditPageFaviconHandler? _faviconHandler;
+    private readonly DebouncedAction _debouncedPreviewUpdate = new(500);
+
     public Widget Widget { get; set; }
     public ObservableCollection<ForceInCurrentTabPattern> ForceInCurrentTabPatterns { get; } = new();
 
@@ -48,24 +52,36 @@ public sealed partial class WidgetEditPage : Page
     {
         this.InitializeComponent();
         this.Loaded += OnPageLoad;
+
+        ArgumentNullException.ThrowIfNull(App.AppHost);
+        _widgetFileSystemService = App.AppHost.Services.GetRequiredService<WidgetFileSystemService>();
     }
 
     private async void OnPageLoad(object sender, RoutedEventArgs e)
     {
         await PreviewWebView.EnsureCoreWebView2Async();
+
+        ArgumentNullException.ThrowIfNull(_widgetFileSystemService);
+        _faviconHandler = new WidgetEditPageFaviconHandler(
+            NameFaviconImage,
+            FaviconSpinner,
+            NameTextBox,
+            CustomFaviconFilename,
+            CustomFaviconIndicator,
+            DeleteCustomFaviconButton,
+            _widgetFileSystemService.WidgetsFolderPath);
+
         UpdateUrlHtmlFieldStates();
         await UpdatePreview();
     }
 
     private async Task UpdatePreview()
     {
-        // Check if CoreWebView2 is initialized
         if (PreviewWebView.CoreWebView2 == null)
         {
             return;
         }
 
-        // Apply options before navigation
         foreach (var option in Options)
         {
             option.Apply(Widget, PreviewWebView, null);
@@ -73,13 +89,24 @@ public sealed partial class WidgetEditPage : Page
 
         PreviewWebView.Width = Widget.Width;
         PreviewWebView.Height = Widget.Height;
-        
-        // Check if we have content to display
+
         if (!string.IsNullOrWhiteSpace(Widget.Html) || !string.IsNullOrWhiteSpace(Widget.Url))
         {
+            if (_faviconHandler != null)
+            {
+                // Ensure handler is attached to WebView before navigation
+                if (PreviewWebView.CoreWebView2 != null && Widget != null)
+                {
+                    _faviconHandler.AttachToWebView(PreviewWebView.CoreWebView2, Widget);
+                }
+
+                _faviconHandler.ResetForNewNavigation();
+                UpdateSaveButtonState();
+            }
+
             PlaceholderPanel.Visibility = Visibility.Collapsed;
             PreviewWebView.Visibility = Visibility.Visible;
-            
+
             try
             {
                 await CustomWidgetLoader.LoadAsync(Widget, PreviewWebView);
@@ -89,8 +116,7 @@ public sealed partial class WidgetEditPage : Page
                 // Show error in placeholder
                 PreviewWebView.Visibility = Visibility.Collapsed;
                 PlaceholderPanel.Visibility = Visibility.Visible;
-                
-                // Update placeholder to show error (reusing existing elements)
+
                 var stackPanel = PlaceholderPanel.Child as StackPanel;
                 if (stackPanel != null && stackPanel.Children.Count >= 2)
                 {
@@ -109,7 +135,7 @@ public sealed partial class WidgetEditPage : Page
         }
     }
 
-    protected override void OnNavigatedTo(NavigationEventArgs e)
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
 
@@ -119,10 +145,12 @@ public sealed partial class WidgetEditPage : Page
             _widgetManager = args.WidgetManager;
             _isNewWidget = args.IsNewWidget;
 
+            // Backup original widget state for cancel
+            _originalWidget = Widget.Clone();
+
             Widget.PropertyChanged += Widget_PropertyChanged;
             TouchEnabledSwitch.IsOn = Widget.TouchEnabled.GetValueOrDefault();
-            
-            // Load ForceInCurrentTab patterns
+
             ForceInCurrentTabPatterns.Clear();
             if (Widget.ForceInCurrentTab != null)
             {
@@ -132,20 +160,58 @@ public sealed partial class WidgetEditPage : Page
                 }
             }
 
-            // Set initial enabled state for URL/HTML fields
             UpdateUrlHtmlFieldStates();
+
+            PageTitle.Text = _isNewWidget ? "Create Widget" : "Edit Widget";
+
+            if (!_isNewWidget && _faviconHandler != null)
+            {
+                OpenFolderButton.Visibility = Visibility.Visible;
+                await _faviconHandler.LoadExistingAsync(Widget);
+                _faviconHandler.UpdateCustomFaviconIndicator(Widget);
+            }
         }
     }
 
-    private void Save_Click(object sender, RoutedEventArgs e)
+    private void UpdateSaveButtonState()
     {
-        if (_widgetManager == null) return;
+        var hasContent = !string.IsNullOrWhiteSpace(Widget.Url) || !string.IsNullOrWhiteSpace(Widget.Html);
+        var isFetchingFavicon = _faviconHandler?.IsFetching ?? false;
+        SaveButton.IsEnabled = !isFetchingFavicon && hasContent;
+    }
 
-        // Convert ForceInCurrentTab patterns back to strings
-        Widget.ForceInCurrentTab = ForceInCurrentTabPatterns
-            .Select(p => p.Pattern)
-            .Where(p => !string.IsNullOrWhiteSpace(p))
-            .ToList();
+    private async void BrowseFavicon_Click(object sender, RoutedEventArgs e)
+    {
+        if (_faviconHandler == null) return;
+        await _faviconHandler.BrowseForCustomFaviconAsync(Widget);
+        UpdateSaveButtonState();
+    }
+
+    private async void DeleteCustomFavicon_Click(object sender, RoutedEventArgs e)
+    {
+        if (_faviconHandler == null || _widgetManager == null) return;
+        await _faviconHandler.DeleteCustomFaviconAsync(Widget, _widgetManager);
+    }
+
+    private void OpenWidgetFolder_Click(object sender, RoutedEventArgs e)
+    {
+        if (_widgetFileSystemService == null) return;
+
+        try
+        {
+            var widgetFolder = Widget.GetFolderPath(_widgetFileSystemService.WidgetsFolderPath);
+            DirectoryUtil.OpenDirectoryInFileExplorer(widgetFolder);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to open widget folder: {ex.Message}");
+        }
+    }
+
+    private async void Save_Click(object sender, RoutedEventArgs e)
+    {
+        if (_widgetManager == null || _widgetFileSystemService == null) return;
+
         Widget.ForceInCurrentTab = ForceInCurrentTabPatterns
             .Select(p => p.Pattern)
             .Where(p => !string.IsNullOrWhiteSpace(p))
@@ -153,17 +219,20 @@ public sealed partial class WidgetEditPage : Page
 
         if (_isNewWidget)
         {
-            // Generate a filename based on widget name
             var safeName = string.Join("_", Widget.Name.Split(Path.GetInvalidFileNameChars()));
             if (string.IsNullOrWhiteSpace(safeName))
-            {
                 safeName = "widget";
-            }
-            Widget.FileName = $"{safeName.ToLower()}.widget.json";
-            
-            // Ensure the widget has an ID
+
+            Widget.FileName = $"{safeName.ToLower()}{Widget.FullFileExtension}";
             Widget.Id ??= Guid.NewGuid();
         }
+
+        if (_faviconHandler != null)
+        {
+            await _faviconHandler.SavePendingFaviconsAsync(Widget);
+        }
+
+        _debouncedPreviewUpdate.Cancel();
 
         _widgetManager.SaveWidget(Widget, true);
         Frame.GoBack();
@@ -171,8 +240,7 @@ public sealed partial class WidgetEditPage : Page
 
     private void Widget_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        Debug.WriteLine("Changed");
-        UpdatePreview();
+        _debouncedPreviewUpdate.Execute(UpdatePreview);
     }
 
     private void TouchEnabledSwitch_Toggled(object sender, RoutedEventArgs e)
@@ -187,11 +255,16 @@ public sealed partial class WidgetEditPage : Page
     private void OnUrlOrHtmlChanged(object sender, TextChangedEventArgs e)
     {
         UpdateUrlHtmlFieldStates();
+        _debouncedPreviewUpdate.Execute(UpdatePreview);
+    }
+
+    private void OnInputChanged(object sender, TextChangedEventArgs e)
+    {
+        _debouncedPreviewUpdate.Execute(UpdatePreview);
     }
 
     private void UpdateUrlHtmlFieldStates()
     {
-        // Disable HTML field if URL has content, and vice versa
         var hasUrl = !string.IsNullOrWhiteSpace(UrlTextBox.Text);
         var hasHtml = !string.IsNullOrWhiteSpace(HtmlTextBox.Text);
 
@@ -207,7 +280,6 @@ public sealed partial class WidgetEditPage : Page
             Domain = "",
             UserAgent = ""
         });
-
         UpdateUserAgentsinEditor();
     }
 
@@ -216,7 +288,6 @@ public sealed partial class WidgetEditPage : Page
         if (sender is Button button && button.Tag is UserAgentMapping mapping)
         {
             Widget.CustomUserAgent?.Remove(mapping);
-            
             UpdateUserAgentsinEditor();
         }
     }
@@ -245,6 +316,15 @@ public sealed partial class WidgetEditPage : Page
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
     {
+        _debouncedPreviewUpdate.Cancel();
+
+        if (_originalWidget != null)
+        {
+            Widget.CopyFrom(_originalWidget);
+        }
+
+        _faviconHandler?.Cleanup();
+
         Frame.GoBack();
     }
 }
