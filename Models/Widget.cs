@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
@@ -214,7 +215,7 @@ public partial class Widget : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Creates a shallow copy of this widget for backup/restore purposes.
+    /// Creates a deep copy of this widget for backup/restore purposes.
     /// </summary>
     public Widget Clone()
     {
@@ -231,10 +232,11 @@ public partial class Widget : INotifyPropertyChanged
             TouchEnabled = TouchEnabled,
             Enabled = Enabled,
             FileName = FileName,
-            ForceInCurrentTab = ForceInCurrentTab,
-            CustomUserAgent = CustomUserAgent,
+            ForceInCurrentTab = ForceInCurrentTab != null ? [..ForceInCurrentTab] : null,
+            CustomUserAgent = CustomUserAgent?.Select(ua => new UserAgentMapping { Domain = ua.Domain, UserAgent = ua.UserAgent }).ToList(),
             FaviconPath = FaviconPath,
-            CustomFaviconPath = CustomFaviconPath
+            CustomFaviconPath = CustomFaviconPath,
+            CustomScript = CustomScript
         };
     }
 
@@ -254,8 +256,10 @@ public partial class Widget : INotifyPropertyChanged
         TouchEnabled = other.TouchEnabled;
         Enabled = other.Enabled;
         FileName = other.FileName;
-        ForceInCurrentTab = other.ForceInCurrentTab;
-        CustomUserAgent = other.CustomUserAgent;
+        ForceInCurrentTab = other.ForceInCurrentTab != null ? [..other.ForceInCurrentTab] : null;
+        CustomUserAgent = other.CustomUserAgent?.Select(ua => new UserAgentMapping { Domain = ua.Domain, UserAgent = ua.UserAgent }).ToList();
         FaviconPath = other.FaviconPath;
+        CustomFaviconPath = other.CustomFaviconPath;
+        CustomScript = other.CustomScript;
     }
 }
