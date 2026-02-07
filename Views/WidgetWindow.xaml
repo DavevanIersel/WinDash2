@@ -42,12 +42,23 @@
                 Background="#80000000"
                 Visibility="Collapsed">
             <Grid>
-                <TextBlock x:Name="WidgetTitle"
-                           Text="Widget"
-                           Foreground="White"
+                <!-- Widget title with favicon -->
+                <StackPanel Orientation="Horizontal"
                            VerticalAlignment="Center"
                            Margin="12,0,0,0"
-                           FontSize="12"/>
+                           Spacing="8">
+                    <Image x:Name="DragBarFaviconImage"
+                           Width="16"
+                           Height="16"
+                           VerticalAlignment="Center"
+                           Visibility="Collapsed"/>
+                    <TextBlock x:Name="WidgetTitle"
+                               Text="Widget"
+                               Foreground="White"
+                               VerticalAlignment="Center"
+                               FontSize="12"/>
+                </StackPanel>
+                
                 <Button x:Name="CloseButton"
                         Content="&#xE8BB;"
                         FontFamily="Segoe MDL2 Assets"

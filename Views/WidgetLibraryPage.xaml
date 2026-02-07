@@ -48,6 +48,20 @@
             CanSortColumns="True">
 
             <tableView:TableView.Columns>
+                <!-- Favicon Column -->
+                <tableView:TableViewTemplateColumn MaxWidth="20">
+                    <tableView:TableViewTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="models:Widget">
+                            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Image x:Name="FaviconImage" 
+                                       Width="16" 
+                                       Height="16"
+                                       Loaded="FaviconImage_Loaded"/>
+                            </Grid>
+                        </DataTemplate>
+                    </tableView:TableViewTemplateColumn.CellTemplate>
+                </tableView:TableViewTemplateColumn>
+                
                 <tableView:TableViewTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
                 <tableView:TableViewTemplateColumn Header="Enabled" Width="90">
                     <tableView:TableViewTemplateColumn.CellTemplate>
