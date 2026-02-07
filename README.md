@@ -9,9 +9,10 @@ It is a complete rewrite of WinDash, focused on simplicity, performance, and nat
 -   **Stack**: .NET 8, WinUI 3
 
   <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/26120621-1d88-427c-974b-7d73b571d92e" />
-  <img width="1905" height="1011" alt="image" src="https://github.com/user-attachments/assets/0df04c3d-e937-45f1-87c9-b1c9d187f75e" />
-  <img width="1899" height="1007" alt="image" src="https://github.com/user-attachments/assets/304d0d81-a712-41fc-9fb1-44fd786d1ffb" />
-  <img width="1903" height="755" alt="image" src="https://github.com/user-attachments/assets/da6d153e-52a4-4aaf-b502-9c62b2cf7862" />
+  <img width="1904" height="1050" alt="image" src="https://github.com/user-attachments/assets/6510f2d8-3766-4ee4-94f3-5aba95e29903" />
+  <img width="1904" height="1014" alt="image" src="https://github.com/user-attachments/assets/212d044e-8204-4293-aa58-c30dd2019dc8" />
+  <img width="1902" height="1016" alt="image" src="https://github.com/user-attachments/assets/293945ec-e542-4b9e-ae23-1f41e0f52178" />
+
 
 ---
 
