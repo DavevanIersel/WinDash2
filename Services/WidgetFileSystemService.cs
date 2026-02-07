@@ -86,7 +86,7 @@ public class WidgetFileSystemService
 
         var widgetFilePath = GetWidgetFilePath(widget);
         using var stream = File.Create(widgetFilePath);
-        JsonSerializer.SerializeAsync(stream, widget, _jsonOptions);
+        JsonSerializer.Serialize(stream, widget, _jsonOptions);
     }
 
     public void DeleteWidget(Widget widget)
