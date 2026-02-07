@@ -5,7 +5,6 @@
 It is a complete rewrite of WinDash, focused on simplicity, performance, and native Windows integration.
 
 -   **Web Widgets**: Embed any webpage as a desktop widget.
--   **Portable by Design**: No installer, no registry writes — just run the executable.
 -   **Built for Windows**: Windows 10/11 only.
 -   **Stack**: .NET 8, WinUI 3
 
