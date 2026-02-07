@@ -34,6 +34,8 @@ public sealed partial class WidgetEditPage : Page
     private Widget? _originalWidget;
     private WidgetEditPageFaviconHandler? _faviconHandler;
     private readonly DebouncedAction _debouncedPreviewUpdate = new(500);
+    private string? _lastNavigatedUrl;
+    private string? _lastNavigatedHtml;
 
     public Widget Widget { get; set; }
     public ObservableCollection<ForceInCurrentTabPattern> ForceInCurrentTabPatterns { get; } = new();
@@ -71,6 +73,17 @@ public sealed partial class WidgetEditPage : Page
             DeleteCustomFaviconButton,
             _widgetFileSystemService.WidgetsFolderPath);
 
+        // Load existing favicon for existing widgets
+        if (!_isNewWidget)
+        {
+            await _faviconHandler.LoadExistingAsync(Widget);
+            _faviconHandler.UpdateCustomFaviconIndicator(Widget);
+            
+            // Initialize navigation tracking to prevent unnecessary reset on first UpdatePreview
+            _lastNavigatedUrl = Widget.Url;
+            _lastNavigatedHtml = Widget.Html;
+        }
+
         UpdateUrlHtmlFieldStates();
         await UpdatePreview();
     }
@@ -100,8 +113,13 @@ public sealed partial class WidgetEditPage : Page
                     _faviconHandler.AttachToWebView(PreviewWebView.CoreWebView2, Widget);
                 }
 
-                _faviconHandler.ResetForNewNavigation();
-                UpdateSaveButtonState();
+                // Only reset favicon state if URL/HTML actually changed (not just width/height/etc)
+                if (_lastNavigatedUrl != Widget.Url || _lastNavigatedHtml != Widget.Html)
+                {
+                    _faviconHandler.ResetForNewNavigation();
+                    _lastNavigatedUrl = Widget.Url;
+                    _lastNavigatedHtml = Widget.Html;
+                }
             }
 
             PlaceholderPanel.Visibility = Visibility.Collapsed;
@@ -164,11 +182,9 @@ public sealed partial class WidgetEditPage : Page
 
             PageTitle.Text = _isNewWidget ? "Create Widget" : "Edit Widget";
 
-            if (!_isNewWidget && _faviconHandler != null)
+            if (!_isNewWidget)
             {
                 OpenFolderButton.Visibility = Visibility.Visible;
-                await _faviconHandler.LoadExistingAsync(Widget);
-                _faviconHandler.UpdateCustomFaviconIndicator(Widget);
             }
         }
     }
@@ -176,15 +192,13 @@ public sealed partial class WidgetEditPage : Page
     private void UpdateSaveButtonState()
     {
         var hasContent = !string.IsNullOrWhiteSpace(Widget.Url) || !string.IsNullOrWhiteSpace(Widget.Html);
-        var isFetchingFavicon = _faviconHandler?.IsFetching ?? false;
-        SaveButton.IsEnabled = !isFetchingFavicon && hasContent;
+        SaveButton.IsEnabled = !_isNewWidget || hasContent;
     }
 
     private async void BrowseFavicon_Click(object sender, RoutedEventArgs e)
     {
         if (_faviconHandler == null) return;
         await _faviconHandler.BrowseForCustomFaviconAsync(Widget);
-        UpdateSaveButtonState();
     }
 
     private async void DeleteCustomFavicon_Click(object sender, RoutedEventArgs e)
@@ -240,6 +254,15 @@ public sealed partial class WidgetEditPage : Page
 
     private void Widget_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        UpdateSaveButtonState();
+
+        // Don't update preview for properties that don't affect the display
+        if (e.PropertyName is nameof(Widget.Name) or nameof(Widget.Enabled) or 
+            nameof(Widget.X) or nameof(Widget.Y) or nameof(Widget.Id) or nameof(Widget.FileName))
+        {
+            return;
+        }
+
         _debouncedPreviewUpdate.Execute(UpdatePreview);
     }
 

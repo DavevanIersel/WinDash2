@@ -39,7 +39,6 @@ internal class WidgetEditPageFaviconHandler(
     private Widget? _currentWidget;
 
     public Stream? PendingFaviconStream { get; private set; }
-    public bool IsFetching { get; private set; }
 
     /// <summary>
     /// Attaches to WebView2 navigation events to fetch favicon when pages load.
@@ -62,10 +61,10 @@ internal class WidgetEditPageFaviconHandler(
     /// </summary>
     public void ResetForNewNavigation()
     {
-        IsFetching = true;
         PendingFaviconStream?.Dispose();
         PendingFaviconStream = null;
         ShowSpinner();
+        HideFavicon();
     }
 
     /// <summary>
@@ -75,7 +74,6 @@ internal class WidgetEditPageFaviconHandler(
     {
         if (!e.IsSuccess || _coreWebView == null || _currentWidget == null)
         {
-            IsFetching = false;
             HideSpinner();
             HideFavicon();
             return;
@@ -84,7 +82,6 @@ internal class WidgetEditPageFaviconHandler(
         // Skip if custom favicon is set
         if (!string.IsNullOrEmpty(_currentWidget.CustomFaviconPath))
         {
-            IsFetching = false;
             HideSpinner();
             return;
         }
@@ -119,7 +116,6 @@ internal class WidgetEditPageFaviconHandler(
         }
         finally
         {
-            IsFetching = false;
             HideSpinner();
             if (PendingFaviconStream == null)
             {
@@ -136,6 +132,7 @@ internal class WidgetEditPageFaviconHandler(
         try
         {
             var bitmap = await FaviconUtil.LoadFaviconAsync(widget, _widgetsRootPath);
+            
             if (bitmap != null)
             {
                 _faviconImage.Source = bitmap;
@@ -205,8 +202,6 @@ internal class WidgetEditPageFaviconHandler(
 
                 _pendingCustomFaviconStream?.Dispose();
                 _pendingCustomFaviconStream = memoryStream;
-
-                IsFetching = false;
 
                 await DisplayAsync(memoryStream);
                 UpdateCustomFaviconIndicator(widget);
@@ -288,6 +283,7 @@ internal class WidgetEditPageFaviconHandler(
     public void UpdateCustomFaviconIndicator(Widget widget)
     {
         var hasCustomFavicon = !string.IsNullOrWhiteSpace(widget.CustomFaviconPath) || _pendingCustomFaviconStream != null;
+        
         _customFaviconIndicator.Visibility = hasCustomFavicon ? Visibility.Visible : Visibility.Collapsed;
         _deleteCustomFaviconButton.Visibility = hasCustomFavicon ? Visibility.Visible : Visibility.Collapsed;
 
@@ -336,9 +332,7 @@ internal class WidgetEditPageFaviconHandler(
 
     private void HideFavicon()
     {
-        _faviconSpinner.Visibility = Visibility.Collapsed;
         _faviconImage.Visibility = Visibility.Collapsed;
         _faviconImage.Source = null;
-        _nameTextBox.Padding = new Thickness(12, 8, 12, 8);
     }
 }
