@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,6 +19,7 @@ public class DebouncedAction(int delayMilliseconds = 500)
     public async void Execute(Func<Task> action)
     {
         _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
         _cancellationTokenSource = new CancellationTokenSource();
         var token = _cancellationTokenSource.Token;
 
@@ -37,6 +39,10 @@ public class DebouncedAction(int delayMilliseconds = 500)
         catch (ObjectDisposedException)
         {
             // Expected when disposed (e.g., navigating away)
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Debounced action failed: {ex.Message}");
         }
     }
 
