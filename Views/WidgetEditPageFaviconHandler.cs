@@ -157,14 +157,16 @@ internal class WidgetEditPageFaviconHandler(
     {
         try
         {
-            var memoryStream = new MemoryStream();
+            using var memoryStream = new MemoryStream();
             faviconStream.Position = 0;
             await faviconStream.CopyToAsync(memoryStream);
             memoryStream.Position = 0;
 
             var bitmap = new BitmapImage();
-            var randomAccessStream = memoryStream.AsRandomAccessStream();
-            await bitmap.SetSourceAsync(randomAccessStream);
+            using (var randomAccessStream = memoryStream.AsRandomAccessStream())
+            {
+                await bitmap.SetSourceAsync(randomAccessStream);
+            }
 
             _faviconImage.Source = bitmap;
             ShowFavicon();
